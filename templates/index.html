@@ -1,3 +1,18 @@
-<title>AAAAA</title>
-<h1>Etusivu</h1>
-<p>TERVE!???</p>
+<!DOCTYPE html>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<body>
+    {% if session.username %}
+        <p>Olet kirjautunut nimellä {{ session.username }}</p>
+        <a href="/logout">Kirjaudu ulos</a>
+    {% else %}
+        <form action="/login" method="POST">
+            <p>Tunnus:<br>
+        <input type="text" name="username"></p>
+            <p>Salasanaa:<br>
+        <input type="password" name="password"></p>
+        <input type="submit" value="Kirjaudu">
+        <p><a href="/signup">Luo käyttäjä</a></p>
+        </form>
+    {% endif %}
+</body>

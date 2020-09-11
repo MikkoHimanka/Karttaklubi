@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<body>
+    <p>Luo uusi käyttäjätunnus</p>
+    <form action="/newuser" method="POST">
+        <p>Tunnus:<br>
+    <input type="text" name="username"></p>
+        <p>Salasana:<br>
+    <input type="password" name="password"></p>
+    <input type="submit" value="Luo käyttäjä">
+    </form>
+</body>
