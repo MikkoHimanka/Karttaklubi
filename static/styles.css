@@ -3,3 +3,17 @@ body {
     max-width: 45em;
     font-family: 'Helvetica', 'Arial', sans-serif;
 }
+
+.maps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 5fv);
+    grid-gap: 15px;
+}
+
+[class^="map"] {
+    background-color: brown;
+    height: 64px;
+    width: 64px;
+}
+

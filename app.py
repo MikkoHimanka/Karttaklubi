@@ -12,7 +12,12 @@ db = SQLAlchemy(app)
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    if session:
+        maps = [[{"id": 1, "img": 1}, {"id": 2, "img": 1}], [{"id": 3, "img": 1}, {"id": 4, "img": 5}]]
+
+        return render_template("alku.html", maps=maps)
+    else:
+        return render_template("index.html")
 
 @app.route("/login", methods=["POST"])
 def login():

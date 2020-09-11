@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<body>
+    {% if session.username %}
+        <p>Olet kirjautunut nimellä {{ session.username }}</p>
+        <a href="/logout">Kirjaudu ulos</a>
+
+        <div class="maps">
+            {% for rows in maps %}
+                {% for map in rows %}
+                <div class="map" id={{map.id}}></div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</body>
