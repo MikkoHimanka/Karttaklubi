@@ -6,12 +6,22 @@
         <p>Olet kirjautunut nimellä {{ session.username }}</p>
         <a href="/logout">Kirjaudu ulos</a>
 
+        <p>{{ userid }}</p>
+
+        {% if (maps | count) == 0 %}
+        <p>You have no maps</p>
+        
+
+
+        {% else %}
+        {{maps}}
         <div class="maps">
-            {% for rows in maps %}
-                {% for map in rows %}
-                <div class="map" id={{map.id}}></div>
-                {% endfor %}
+            {% for map in maps %}
+                <a href=maps/{{map[0]}}><div class="map" id={{map}}></div></a>
             {% endfor %}
         </div>
+        {% endif %}
+
+        <a href=/newmap><button>New map</button></a>
     {% endif %}
 </body>

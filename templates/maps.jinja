@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<body>
+    {% if session.username %}
+        <p>Olet kirjautunut nimellä {{ session.username }}</p>
+        <a href="/logout">Kirjaudu ulos</a>
+
+        <p>{{mapcollection}}</p>
+
+        {% if mapcollection[3] != ""  %}
+            <h2>Untitled map</h2>
+        {% else %}
+            <h2>{{mapcollection[2]}}</h2>
+        {% endif %}
+
+        {% for a in mapcollection[2] %}
+            {{ a }}
+        {% endfor %}
+
+        <div class="buttons">
+            <a href=/maps/new_row/{{mapcollection[0]}}><button>New row</button></a>
+            <a href=/new_column><button>New column</button></a>
+        </div>
+    {% endif %}
+</body>
