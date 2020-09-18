@@ -14,10 +14,9 @@
 
 
         {% else %}
-        {{maps}}
         <div class="maps">
             {% for map in maps %}
-                <a href=maps/{{map[0]}}><div class="map" id={{map}}></div></a>
+                <a href=maps/{{map[0]}}>Kartta</a>
             {% endfor %}
         </div>
         {% endif %}

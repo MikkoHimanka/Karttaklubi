@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<script
+    src="https://code.jquery.com/jquery-3.5.1.js"
+    integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+    crossorigin="anonymous"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<body>
+    <h1>EDITORI</h1>
+    <canvas id="canvas" width="64" height="64" class="canvas">Update your browser to support HTML5 Canvas</canvas>
+    {% block canvasscript %}
+        <script>var data = JSON.parse({{ map_data | tojson }})</script>
+    {% endblock %}
+
+    <script src="{{ url_for('static', filename='map_canvas.js') }}"></script>
+
+    {% block savescript %}
+        <script>
+            function save() {
+                save_data = JSON.stringify(data)
+                $.post("/save_map", { data: save_data, id: {{map_id}} });
+            }
+        </script>
+    {% endblock %}
+    <button onclick="save()">Save</button>  
+</body>

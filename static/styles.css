@@ -4,16 +4,13 @@ body {
     font-family: 'Helvetica', 'Arial', sans-serif;
 }
 
-.maps {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(4, 5fv);
-    grid-gap: 15px;
+.canvas {
+    width: 512px;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
 }
 
-[class^="map"] {
-    background-color: brown;
-    height: 64px;
-    width: 64px;
+.maplink {
+    width: 128px;
+    border: 2px solid #000000;
 }
-

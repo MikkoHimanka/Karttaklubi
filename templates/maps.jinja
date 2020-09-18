@@ -1,26 +1,66 @@
 <!DOCTYPE html>
 <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<script
+    src="https://code.jquery.com/jquery-3.5.1.js"
+    integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+    crossorigin="anonymous"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <body>
     {% if session.username %}
         <p>Olet kirjautunut nimellä {{ session.username }}</p>
-        <a href="/logout">Kirjaudu ulos</a>
-
-        <p>{{mapcollection}}</p>
+        <a href="/logout">Kirjaudu ulos</a> | <a href="/">Takaisin</a>
 
         {% if mapcollection[3] != ""  %}
             <h2>Untitled map</h2>
         {% else %}
             <h2>{{mapcollection[2]}}</h2>
         {% endif %}
+        <script>
+            function applyColor(i, [r,g,b]) {
+                imageData.data[4*i] = r;        //R
+                imageData.data[4*i + 1] = g;    //G
+                imageData.data[4*i + 2] = b;  //B
+                imageData.data[4*i + 3] = 255;  //A
+            }
 
-        {% for a in mapcollection[2] %}
-            {{ a }}
+            function createImage() {
+                for (let i = 0; i < jdata.length; i++) {
+                    dataEntity = jdata[i];
+                    if (dataEntity == 0) {
+                        applyColor(i, [0,0,255]);
+                    } else if (dataEntity <= 10) {
+                        applyColor(i, [245,230,66]);
+                    } else if (dataEntity <= 20) {
+                        applyColor(i, [72,117,8]);
+                    }
+                    
+                }
+                context.putImageData(imageData, 0, 0);
+            }
+        </script>
+        <script>
+        var indeksi = 0
+        </script>
+        {% for i in range(mapcollection[4]) %}
+            <p>
+            {% for o in mapcollection[2][i] %}
+                <a href=/editor/{{o}}><canvas id={{o}} width="64" height="64" class="maplink">Update your browser to support HTML5 Canvas</canvas></a>
+                <script>
+                    //var jdata = JSON.parse({{ submaps | tojson }})
+                    var jdata = {{submaps}}[indeksi];
+                    canvas = document.getElementById("{{o}}");
+                    context = canvas.getContext('2d');
+                    imageData = context.createImageData(Math.sqrt(jdata.length), Math.sqrt(jdata.length));
+                    createImage();
+                    indeksi++;
+                </script>
+            {% endfor %}
+            </p>
         {% endfor %}
 
         <div class="buttons">
             <a href=/maps/new_row/{{mapcollection[0]}}><button>New row</button></a>
-            <a href=/new_column><button>New column</button></a>
+            <a href=/maps/new_column/{{mapcollection[0]}}><button>New column</button></a>
         </div>
     {% endif %}
 </body>
