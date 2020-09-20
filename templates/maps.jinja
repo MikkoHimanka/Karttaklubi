@@ -6,15 +6,35 @@
     crossorigin="anonymous"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <body>
+    <div class="messagesWrap">
+        <div class="msgTitle">Viestit</div>
+        <div class="messages">
+        {% for x in messages %}
+            <p>{{x[1]}}</p>
+        {% endfor %}
+        </div>
+        <div class="msgTextArea">
+            <form action="/newmsg/{{mapcollection[0]}}" method="POST">
+            <input type="text" name="msg">
+            <input type="submit" value="->">
+            </form>
+        </div>
+    </div>
+    <div class="contentWrap">
     {% if session.username %}
         <p>Olet kirjautunut nimellä {{ session.username }}</p>
         <a href="/logout">Kirjaudu ulos</a> | <a href="/">Takaisin</a>
-
-        {% if mapcollection[3] != ""  %}
-            <h2>Untitled map</h2>
-        {% else %}
-            <h2>{{mapcollection[2]}}</h2>
-        {% endif %}
+            <script src="{{ url_for('static', filename='map_title.js') }}"></script>
+            <div id="title" onclick="rename()"><h2>
+                {% if mapcollection[3] != None %}
+                {{mapcollection[3]}}
+                {% else %}
+                Nimetön kartta
+                {% endif %}
+            </h2></div>
+            <div id="editor">
+                <input type="button" value="Tallenna" onclick="saveName()" />
+            </div>
         <script>
             function applyColor(i, [r,g,b]) {
                 imageData.data[4*i] = r;        //R
@@ -46,7 +66,6 @@
             {% for o in mapcollection[2][i] %}
                 <a href=/editor/{{o}}><canvas id={{o}} width="64" height="64" class="maplink">Update your browser to support HTML5 Canvas</canvas></a>
                 <script>
-                    //var jdata = JSON.parse({{ submaps | tojson }})
                     var jdata = {{submaps}}[indeksi];
                     canvas = document.getElementById("{{o}}");
                     context = canvas.getContext('2d');
@@ -63,4 +82,5 @@
             <a href=/maps/new_column/{{mapcollection[0]}}><button>New column</button></a>
         </div>
     {% endif %}
+    </div>
 </body>

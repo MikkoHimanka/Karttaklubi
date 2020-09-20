@@ -90,15 +90,17 @@ def maps(map_id):
     map_query = "SELECT * FROM mapcollections WHERE id=:map_id"
     map_result = db.session.execute(map_query, {"map_id": map_id}).fetchone()
     maps = []
+    
     for row in map_result[2]:
         for m in row:
             submap_query = "SELECT id, mapdata FROM maps WHERE id=:submap_id"
             submap_result = db.session.execute(submap_query, {"submap_id":m}).fetchone()[1]
             maps.append(submap_result)
     
+    msg_query = "SELECT * FROM messages WHERE owner_id=:id"
+    msg_result = db.session.execute(msg_query, {"id":map_id}).fetchall()
 
-
-    return render_template("maps.jinja", mapcollection=map_result, submaps=maps)
+    return render_template("maps.jinja", mapcollection=map_result, submaps=maps, messages=msg_result)
 
 @app.route("/editor/<int:map_id>")
 def editor(map_id):
@@ -140,7 +142,15 @@ def newuser():
     db.session.execute(sql, {"username":username,"password":hash_value})
     db.session.commit()
     return redirect("/")
-    
+
+@app.route("/newmsg/<int:map_id>", methods=["POST"])
+def new_msg(map_id):
+    msg = request.form["msg"]
+    sql = "INSERT INTO messages (message, owner_id, time) VALUES (:msg, :id, CURRENT_TIMESTAMP)"
+    db.session.execute(sql, {"msg":msg, "id":map_id})
+    db.session.commit()
+    return redirect("/maps/"+str(map_id))
+
 @app.route("/logout")
 def logout():
     del session["user_id"]

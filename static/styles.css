@@ -1,9 +1,3 @@
-body {
-    margin: auto;
-    max-width: 45em;
-    font-family: 'Helvetica', 'Arial', sans-serif;
-}
-
 .canvas {
     width: 512px;
     image-rendering: pixelated;
@@ -13,4 +7,47 @@ body {
 .maplink {
     width: 128px;
     border: 2px solid #000000;
+}
+
+div#editor {
+    display: none;
+}
+
+div#title {
+    display: inline;
+}
+
+.messagesWrap {
+    border: black 2px solid;
+    width: 25%;
+    position: absolute;
+    left: 0px; top: 0px;
+    height: 99%;
+}
+
+.contentWrap {
+    width: 74%;
+    position: absolute;
+    left: 25%;
+    padding-left: 1%;
+}
+
+.msgTitle {
+    height: 1em;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.messages {
+    background-color: lightgray;
+    margin: 10px 0 10px 0;
+    
+}
+
+.msgTextArea {
+    position: absolute;
+    font-size: 14px;
+    bottom: 0;
+    width: 99%;
 }
