@@ -2,6 +2,13 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <body>
+    {% if alert == "empty_username" %}
+        <div id="alertBox">Käyttäjätunnus ei voi olla tyhjä</div>
+    {% endif %}
+    {% if alert == "empty_password" %}
+        <div id="alertBox">Salasana ei voi olla tyhjä</div>
+    {% endif %}
+    <script src="{{ url_for('static', filename='alerts.js') }}"></script>
     <p>Luo uusi käyttäjätunnus</p>
     <form action="/newuser" method="POST">
         <p>Tunnus:<br>
