@@ -1,3 +1,8 @@
+html, body {
+    height: 50vh;
+
+}
+
 .canvas {
     width: 512px;
     image-rendering: pixelated;
@@ -17,14 +22,6 @@ div#title {
     display: inline;
 }
 
-.messagesWrap {
-    border: black 2px solid;
-    width: 25%;
-    position: absolute;
-    left: 0px; top: 0px;
-    height: 99%;
-}
-
 .contentWrap {
     width: 74%;
     position: absolute;
@@ -32,7 +29,32 @@ div#title {
     padding-left: 1%;
 }
 
+.msgTable {
+    margin-top: 5vh;
+    display: table;
+    table-layout: fixed;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 25%;
+    max-height: 50vh;
+}
+
+.msgRow {
+    display: table-row;
+    width: 100%;
+    height: inherit;
+}
+
+.msgCell {
+    display: table-cell;
+    overflow: scroll;
+    width: 100%;
+    height: inherit;
+}
+
 .msgTitle {
+    width: 100%;
     height: 1em;
     font-size: 16px;
     font-weight: bold;
@@ -40,16 +62,67 @@ div#title {
 }
 
 .messages {
-    background-color: lightgray;
+    height: 80vh;
+    overflow-y: auto;
+    overflow-x: hidden;
     margin: 10px 0 10px 0;
+    overflow-wrap: break-word;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    hyphens: auto;
+    display: flex;
+    flex-direction: column-reverse;
     
 }
 
 .msgTextArea {
-    position: absolute;
     font-size: 14px;
-    bottom: 0;
-    width: 99%;
+    width: 100%;
+}
+
+.msg {
+    background-color: lightcoral;
+    text-align: right;
+    padding-right: 1em;
+    padding-top: 0.5em;
+    padding-left: 1em;
+    padding-bottom: 0.5em;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
+
+.myMsg {
+    background-color: lightblue;
+    padding-right: 1em;
+    padding-top: 0.5em;
+    padding-left: 1em;
+    padding-bottom: 0.5em;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    
+}
+
+.msgName {
+    color: whitesmoke;
+    text-shadow: #000 0 0 2px, #000 0 0 2px, #000 0 0 2px; 
+    font-weight: bold;
+    position: relative;
+    width: 100%;
+    top: -0.5em;
+    left: 1em;
+    text-align: left;
+}
+
+.myMsgName {
+    color: whitesmoke;
+    text-shadow: #000 0 0 2px, #000 0 0 2px, #000 0 0 2px; 
+    font-weight: bold;
+    position: relative;
+    width: 100%;
+    top: -0.5em;
+    right: 1em;
+    text-align: right;
 }
 
 #hidden {
@@ -63,4 +136,8 @@ div#title {
 #alertBox {
     position: absolute;
     top: -2em;
+}
+
+.mapsWrapper {
+    
 }

@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template, json, request, redirect, session, make_response
+from flask import render_template, json, request, redirect, session, make_response, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy(app)
@@ -94,7 +94,7 @@ def maps(map_id):
             submap_result = db.session.execute(submap_query, {"submap_id":m}).fetchone()[1]
             maps.append(submap_result)
     
-    msg_query = "SELECT * FROM messages WHERE owner_id=:id"
+    msg_query = "SELECT u.username, m.message, m.id FROM messages m LEFT JOIN users u ON m.author = u.id WHERE owner_id=:id ORDER BY m.time DESC"
     msg_result = db.session.execute(msg_query, {"id":map_id}).fetchall()
 
     return render_template("maps.jinja", mapcollection=map_result, submaps=maps, messages=msg_result)

@@ -17,20 +17,7 @@
     });
 </script>
 <body>
-    <div class="messagesWrap">
-        <div class="msgTitle">Viestit</div>
-        <div class="messages">
-        {% for x in messages %}
-            <p>{{x[1]}}</p>
-        {% endfor %}
-        </div>
-        <div class="msgTextArea">
-            <form action="/newmsg/{{mapcollection[0]}}" method="POST">
-            <input type="text" name="msg">
-            <input type="submit" value="->">
-            </form>
-        </div>
-    </div>
+    {% include "messages.jinja" %}
     <div class="contentWrap">
     {% if session.username %}
         <p>Olet kirjautunut nimellä {{ session.username }}</p>
@@ -72,8 +59,9 @@
         <script>
         var indeksi = 0
         </script>
+        <div class="mapsWrapper">
         {% for i in range(mapcollection[4]) %}
-            <p>
+            <div class="mapRow">
             {% for o in mapcollection[2][i] %}
                 <a href=/editor/{{o}}><canvas id={{o}} width="64" height="64" class="maplink">Update your browser to support HTML5 Canvas</canvas></a>
                 <script>
@@ -85,8 +73,9 @@
                     indeksi++;
                 </script>
             {% endfor %}
-            </p>
+            </div>
         {% endfor %}
+        </div>
 
         <div class="buttons">
             <a href=/maps/new_row/{{mapcollection[0]}}><button>Uusi rivi</button></a>
