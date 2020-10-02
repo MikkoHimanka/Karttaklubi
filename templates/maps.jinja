@@ -18,15 +18,18 @@
     });
 </script>
 <body>
+    <div class="siteWrap">
+    <div class="header">
+            {% include "header.jinja" %}
+    </div>
+    <div style="display: flex; flex-direction: row;">
     {% include "messages.jinja" %}
     <div class="contentWrap">
     {% if session.username %}
-        <p>Olet kirjautunut nimellä {{ session.username }}</p>
-        <a href="/logout">Kirjaudu ulos</a> | <a href="/">Takaisin</a>
             <script src="{{ url_for('static', filename='map_title.js') }}"></script>
             <div id="title" onclick="rename()"><h2>
                 {% if mapcollection[3] != None %}
-                {{mapcollection[3]}}
+                {{title}}
                 {% else %}
                 Nimetön kartta
                 {% endif %}
@@ -37,9 +40,11 @@
         <div id="mapsWrapper"></div>
         <script src="{{ url_for('static', filename='maps.js') }}"></script>
         <div class="buttons">
-            <a href=/maps/new_row/{{mapcollection[0]}}><button>Uusi rivi</button></a>
-            <a href=/maps/new_column/{{mapcollection[0]}}><button>Uusi sarake</button></a>
+            <a href=/maps/new_row/{{mapcollection_id}}><button>Uusi rivi</button></a>
+            <a href=/maps/new_column/{{mapcollection_id}}><button>Uusi sarake</button></a>
         </div>
     {% endif %}
+    </div>
+    </div>
     </div>
 </body>

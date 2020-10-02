@@ -84,11 +84,13 @@ def newmap():
 
 @app.route("/maps/<int:map_id>")
 def maps(map_id):
-    map_query = "SELECT * FROM mapcollections WHERE id=:map_id"
+    map_query = "SELECT maps, name FROM mapcollections WHERE id=:map_id"
     map_result = db.session.execute(map_query, {"map_id": map_id}).fetchone()
+    mapcollection= map_result[0]
+    map_title = map_result[1]
     maps = []
     
-    for row in map_result[2]:
+    for row in mapcollection:
         for m in row:
             submap_query = "SELECT id, mapdata FROM maps WHERE id=:submap_id"
             submap_result = db.session.execute(submap_query, {"submap_id":m}).fetchone()[1]
@@ -97,7 +99,7 @@ def maps(map_id):
     msg_query = "SELECT u.username, m.message, m.id FROM messages m LEFT JOIN users u ON m.author = u.id WHERE owner_id=:id ORDER BY m.time DESC"
     msg_result = db.session.execute(msg_query, {"id":map_id}).fetchall()
 
-    return render_template("maps.jinja", mapcollection=map_result, submaps=maps, messages=msg_result)
+    return render_template("maps.jinja", mapcollection=mapcollection, submaps=maps, messages=msg_result, title=map_title, mapcollection_id=map_id)
 
 @app.route("/editor/<int:map_id>")
 def editor(map_id):

@@ -2,7 +2,8 @@ document.addEventListener('DOMContentLoaded', (e) => {
     if (document.getElementById("alertBox") != null){
         document.cookie = "alert" + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;SameSite=Strict";
         alertBox = document.getElementById("alertBox");
-        alertBox.style.left = window.innerWidth/2 - alertBox.clientWidth/2 +"px";
+        alertBox.style.marginLeft = window.innerWidth/2 - alertBox.clientWidth/2 +"px";
+
     }
 })
 

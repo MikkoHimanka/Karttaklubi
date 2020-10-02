@@ -1,6 +1,8 @@
-html, body {
+body {
     height: 50vh;
-
+    display: flex;
+    background-color: darkseagreen;
+    background-size: 150%;
 }
 
 .canvas {
@@ -12,6 +14,7 @@ html, body {
 
 div#editor {
     display: none;
+    ba
 }
 
 div#title {
@@ -19,9 +22,9 @@ div#title {
 }
 
 .contentWrap {
-    width: 74%;
-    position: absolute;
+
     left: 25%;
+    top: 0;
     padding-left: 1%;
 }
 
@@ -29,10 +32,9 @@ div#title {
     margin-top: 5vh;
     display: table;
     table-layout: fixed;
-    position: absolute;
     top: 0;
     left: 0;
-    width: 25%;
+    min-width: 25%;
     max-height: 50vh;
 }
 
@@ -134,4 +136,45 @@ div#title {
 #alertBox {
     position: absolute;
     top: -2em;
+}
+
+#mapsWrapper {
+    height: 70vh;
+}
+
+.maps {
+    display: inline;   
+}
+
+.centerWrap{
+    display: flex;
+    width: 100vw;
+}
+
+.center {
+    position: relative;
+    top: 10vh;
+    text-align: center;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.header {
+    display: block;
+    top: 0;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.siteWrap {
+    display: flex;
+    flex-direction: column;
+    width: 99vw;
+}
+
+.editor {
+    position: relative;
+    top: 10vh;
+
 }

@@ -1,29 +1,30 @@
-<!DOCTYPE html>
-<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<script
+    src="https://code.jquery.com/jquery-3.5.1.js"
+    integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+    crossorigin="anonymous"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<body>
-    {% if session.username %}
-        {% if alert == "empty_mapname" %}
-            <div id="alertBox">Aseta kartalle nimi!</div>
-        {% endif %}
-        <script src="{{ url_for('static', filename='alerts.js') }}"></script>
-        <p>Olet kirjautunut nimellä {{ session.username }}</p>
-        <a href="/logout">Kirjaudu ulos</a>
-
+<meta id="mapdata" data-megadata="{{megadata}}" data-maps="{{maps}}">
+<div class="centerWrap">
+    <div class="center">
+        <div>
         {% if (maps | count) == 0 %}
-        <p>Et ole luonut vielä karttoja</p>
-        
-
-
+            <p>Et ole luonut vielä karttoja</p>
+            
         {% else %}
-        <div class="maps">
-            {% for map in maps %}
-                <a href=maps/{{map[0]}}>{{map[3]}}</a>
-            {% endfor %}
-        </div>
+            <div class="maps">
+                {% for map in maps %}
+                    <a href=maps/{{map[0]}}>{{map[1]}}</a>
+                    <div id="{{map[0]}}"></div>
+                {% endfor %}
+                
+            </div>
         {% endif %}
 
-        <div><div id="hidden"><form action="/newmap" method="POST"><p>Anna kartalle nimi: <input type="text" name="name"></p><input type="submit" value="Luo kartta"></form></div><div id="newmap"><button id="newmapButton">Uusi kartta</button></div></div>
-        <script src="{{ url_for('static', filename='mapbutton.js') }}"></script>
-    {% endif %}
-</body>
+
+
+            <div><div id="hidden"><form action="/newmap" method="POST"><p>Anna kartalle nimi: <input type="text" name="name"></p><input type="submit" value="Luo kartta"></form></div><div id="newmap"><button id="newmapButton">Uusi kartta</button></div></div>
+            <script src="{{ url_for('static', filename='mapbutton.js') }}"></script>
+
+        </div>
+    </div>
+</div>

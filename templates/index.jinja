@@ -1,20 +1,16 @@
 <!DOCTYPE html>
 <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<head><title>Karttaklubi</title></head>
 <body>
-    {% if alert == "empty_username" %}
-        <div id="alertBox">Käyttäjätunnus ei voi olla tyhjä</div>
-    {% endif %}
-    {% if alert == "empty_password" %}
-        <div id="alertBox">Salasana ei voi olla tyhjä</div>
-    {% endif %}
-    <script src="{{ url_for('static', filename='alerts.js') }}"></script>
-    <form action="/login" method="POST">
-        <p>Tunnus:<br>
-    <input type="text" name="username"></p>
-        <p>Salasana:<br>
-    <input type="password" name="password"></p>
-    <input type="submit" value="Kirjaudu">
-    <p><a href="/signup">Luo käyttäjä</a></p>
-    </form>
+    <div class="siteWrap">
+        {% if session.username %}
+        <div class="header">
+            {% include "header.jinja" %}
+        </div>
+            {% include "alku.jinja" %}
+        {% else %}
+            {% include "login.jinja" %}
+        {% endif %}
+    </div>
 </body>

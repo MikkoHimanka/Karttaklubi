@@ -21,10 +21,11 @@ function createImage(context, imageData) {
 };
 
 var indeksi = 0;
-var data = $('#mapdata').data();
-var mapcollection = data.mapcollection;
 
-var submaps = data.submaps;
+var data = $('#mapdata').data()
+
+var jdata = data.megadata
+
 
 var parent = document.getElementById("mapsWrapper");
 

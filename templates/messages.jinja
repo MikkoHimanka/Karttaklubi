@@ -9,51 +9,51 @@
             <div class="msgCell">
                 <div class="messages" lang="fi">
 
-                {% macro msgs(style, x) -%}
+                {% macro msgsStart(x) -%}
                     {% if session.username == x[0] %}
-                        <div class="myMsg" style="{{style}}">{{x[1]}}</div>
+                        <div class="myMsgName">{{x[0]}}</div><div class="myMsg"></p>{{x[1]}}
                     {% else %}
-                        <div class="msg" style="{{style}}">{{x[1]}}</div>
+                        <div class="msgName">{{x[0]}}</div><div class="msg"><p>{{x[1]}}
                     {% endif %}
                 {%- endmacro %}
 
-                {% macro msgsName(style, x) -%}
-                    {% if session.username == x[0] %}
-                        <div class="myMsgName">{{x[0]}}</div><div class="myMsg" style="{{style}}">{{x[1]}}</div>
-                    {% else %}
-                        <div class="msgName">{{x[0]}}</div><div class="msg" style="{{style}}">{{x[1]}}</div>
-                    {% endif %}
+                {% macro msgsMiddle(x) -%}
+                    <p>{{x[1]}}</p>
+                {%- endmacro %}
+
+                {% macro msgsEnd(x) -%}
+                    <p>{{x[1]}}</p></div>
                 {%- endmacro %}
 
                 {% for x in messages %}
                     {% if not loop.first %}
                         {% if loop.nextitem %}
                             {% if loop.previtem[0] == x[0] and loop.nextitem[0] == x[0] %}
-                                {{msgs("", x)}}
+                                {{msgsMiddle(x)}}
                             {% elif loop.previtem[0] == x[0] and loop.nextitem[0] != x[0] %}
-                                {{msgs("border-radius: 1em 1em 0 0;", x)}}
+                                {{msgsEnd(x)}}
                             {% else %}
                                 {% if loop.nextitem[0] == x[0] %}
-                                    {{ msgsName("border-radius: 0 0 1em 1em", x) }}
+                                    {{ msgsStart(x) }}
                                 {% else %}
-                                    {{ msgsName("border-radius: 1em", x) }}
+                                    {{ msgsStart(x) }}</div>
                                 {% endif %}
                             {% endif %}
                         {% else %}
                             {% if loop.previtem[0] == x[0] %}
-                                {{ msgs("border-radius: 1em 1em 0 0", x) }}
+                                {{ msgsMiddle(x) }}</div>
                             {% else %}
-                                {{ msgsName("border-radius: 1em", x) }}
+                                {{ msgsStart(x) }}</div>
                             {% endif %}
                         {% endif %}                    
                     {% else %}
                         {% if messages | length == 1 %}
-                            {{ msgsName("border-radius: 1em;", x) }}
+                            {{ msgsStart(x) }}</div>
                         {% else %}
                             {% if loop.nextitem[0] == x[0] %}
-                                {{ msgsName("border-radius: 0px 0px 1em 1em;", x) }}
+                                {{ msgsStart(x) }}
                             {% else %}
-                                {{ msgsName("border-radius: 1em 1em 1em 1em;", x) }}
+                                {{ msgsStart(x) }}</div>
                             {% endif %}
                         {% endif %}
                     {% endif %}
@@ -63,7 +63,7 @@
             </div>
         </div>
             <div class="msgTextArea">
-                <form action="/newmsg/{{mapcollection[0]}}" method="POST">
+                <form action="/newmsg/{{mapcollection_id}}" method="POST">
                 <input type="text" name="msg">
                 <input type="submit" value="->">
                 </form>

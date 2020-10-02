@@ -1,0 +1,5 @@
+{% if alert == "empty_mapname" %}
+        <div id="alertBox">Aseta kartalle nimi!</div>
+{% endif %}
+    <script src="{{ url_for('static', filename='alerts.js') }}"></script>
+    <div style="display: flex;"><div style="margin-right: 20em;">Olet kirjautunut nimellä <b>{{ session.username }}</b></div><div><a href="/logout">Kirjaudu ulos</a></div></div>

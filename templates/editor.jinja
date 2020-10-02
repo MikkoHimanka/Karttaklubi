@@ -6,11 +6,18 @@
     crossorigin="anonymous"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <body>
+    <div class="siteWrap">
+        <div class="header">
+        {% include "header.jinja" %}
+        </div>
+    <div>
+    <div class="center">
     <h1>EDITORI</h1>
+    </div>
+
+    <div class="editor">
     <canvas id="canvas" width="64" height="64" class="canvas">Update your browser to support HTML5 Canvas</canvas>
-    {% block canvasscript %}
-        <script>var data = JSON.parse({{ map_data | tojson }})</script>
-    {% endblock %}
+    <script>var data = JSON.parse({{ map_data | tojson }})</script>
 
     <script src="{{ url_for('static', filename='map_canvas.js') }}"></script>
 
@@ -23,4 +30,8 @@
         </script>
     {% endblock %}
     <button onclick="save()">Save</button>  
+    </div>
+    </div>
+    </div>
+
 </body>

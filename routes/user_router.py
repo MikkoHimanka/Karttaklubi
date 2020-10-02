@@ -1,5 +1,5 @@
 from app import app
-from flask import request, redirect, session, render_template, make_response
+from flask import request, redirect, session, render_template, make_response, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -10,11 +10,19 @@ def index():
     alert = ""
     if request.cookies.get("alert"): alert = request.cookies.get("alert")
     if session:
-        mapcollections_query = "SELECT * FROM mapcollections WHERE owner=:user_id"
+        mapcollections_query = "SELECT a.id, a.name, a.maps FROM mapcollections a WHERE owner=:user_id ORDER BY a.id"
         mapcollections_result = db.session.execute(mapcollections_query, {"user_id": session["user_id"]})
         maps = mapcollections_result.fetchall()
 
-        return render_template("alku.jinja", maps=maps, userid=session["user_id"], alert=alert)
+        megadata = []
+        megadata_query = "SELECT id, mapdata FROM maps WHERE id=:id"
+
+        for i in range(len(maps)):
+            for j in range(len(maps[i][2])):
+                megadata_result = db.session.execute(megadata_query, {"id": maps[i][2][j][0]}).fetchall()
+                megadata.append(megadata_result)
+                
+        return render_template("index.jinja", maps=maps, userid=session["user_id"], alert=alert, megadata=megadata)
     else:
 
         return render_template("index.jinja", alert=alert)
