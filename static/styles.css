@@ -9,10 +9,6 @@ html, body {
     image-rendering: crisp-edges;
 }
 
-.maplink {
-    width: 128px;
-    border: 2px solid #000000;
-}
 
 div#editor {
     display: none;
@@ -84,6 +80,7 @@ div#title {
 .msg {
     background-color: lightcoral;
     text-align: right;
+    border-radius: 1em;
     padding-right: 1em;
     padding-top: 0.5em;
     padding-left: 1em;
@@ -94,6 +91,7 @@ div#title {
 
 .myMsg {
     background-color: lightblue;
+    border-radius: 1em;
     padding-right: 1em;
     padding-top: 0.5em;
     padding-left: 1em;
@@ -136,8 +134,4 @@ div#title {
 #alertBox {
     position: absolute;
     top: -2em;
-}
-
-.mapsWrapper {
-    
 }
