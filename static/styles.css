@@ -11,10 +11,12 @@ body {
     image-rendering: crisp-edges;
 }
 
+.buttons {
+    margin:  1em 0 0 1em;
+}
 
 div#editor {
     display: none;
-    ba
 }
 
 div#title {

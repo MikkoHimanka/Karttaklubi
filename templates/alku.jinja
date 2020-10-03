@@ -7,14 +7,17 @@
 <div class="centerWrap">
     <div class="center">
         <div>
+            <div style="margin-top:2em;">
+                <p style="font-weight:bold;text-decoration:underline;">Omat kartat</p>
+            </div>
+
         {% if (maps | count) == 0 %}
             <p>Et ole luonut vielä karttoja</p>
             
         {% else %}
             <div class="maps">
                 {% for map in maps %}
-                    <a href=maps/{{map[0]}}>{{map[1]}}</a>
-                    <div id="{{map[0]}}"></div>
+                    <p><a href=maps/{{map[0]}}>{{map[1]}}</a></p>
                 {% endfor %}
                 
             </div>
@@ -22,9 +25,17 @@
 
 
 
-            <div><div id="hidden"><form action="/newmap" method="POST"><p>Anna kartalle nimi: <input type="text" name="name"></p><input type="submit" value="Luo kartta"></form></div><div id="newmap"><button id="newmapButton">Uusi kartta</button></div></div>
+            <div style="margin-top:2em;"><div id="hidden"><form action="/newmap" method="POST"><p>Anna kartalle nimi: <input type="text" name="name"></p><input type="submit" value="Luo kartta"></form></div><div id="newmap"><button id="newmapButton">Uusi kartta</button></div></div>
             <script src="{{ url_for('static', filename='mapbutton.js') }}"></script>
-
+            <div style="margin-top:2em;">
+                <p style="font-weight:bold;text-decoration:underline;">Julkiset kartat</p>
+            </div>
+            <div class="maps">
+                {% for map in publicMaps%}
+                    <p><a href=maps/{{map[0]}}>"{{map[1]}}" <i>-{{map[2]}}</i></a></p>
+                    
+                {% endfor %}
+            </div>
         </div>
     </div>
 </div>

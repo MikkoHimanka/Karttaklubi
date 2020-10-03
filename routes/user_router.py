@@ -14,6 +14,10 @@ def index():
         mapcollections_result = db.session.execute(mapcollections_query, {"user_id": session["user_id"]})
         maps = mapcollections_result.fetchall()
 
+        public_maps_query = "SELECT a.id, a.name, b.username, a.maps FROM mapcollections a LEFT JOIN users b ON b.id=a.owner WHERE public=True ORDER BY a.id"
+        public_maps_result = db.session.execute(public_maps_query).fetchall()
+
+
         megadata = []
         megadata_query = "SELECT id, mapdata FROM maps WHERE id=:id"
 
@@ -22,7 +26,12 @@ def index():
                 megadata_result = db.session.execute(megadata_query, {"id": maps[i][2][j][0]}).fetchall()
                 megadata.append(megadata_result)
                 
-        return render_template("index.jinja", maps=maps, userid=session["user_id"], alert=alert, megadata=megadata)
+        return render_template("index.jinja",
+            maps=maps,
+            userid=session["user_id"],
+            alert=alert,
+            megadata=megadata,
+            publicMaps=public_maps_result)
     else:
 
         return render_template("index.jinja", alert=alert)
@@ -66,13 +75,22 @@ def newuser():
     username = request.form["username"]
     password = request.form["password"]
 
-    if username.strip() == "":
+    stripName = username.strip()
+
+    username_query = "SELECT * FROM users WHERE username=:name"
+    username_result = db.session.execute(username_query, {"name":stripName}).fetchall()
+
+    if stripName == "":
         response = make_response(redirect("/signup"))
         response.set_cookie("alert", "empty_username")
         return response
     elif password.strip() == "":
         response = make_response(redirect("/signup"))
         response.set_cookie("alert", "empty_password")
+        return response
+    elif len(username_result) > 0:
+        response = make_response(redirect("/signup"))
+        response.set_cookie("alert", "username_taken")
         return response
 
     hash_value = generate_password_hash(password)

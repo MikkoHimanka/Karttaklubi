@@ -4,9 +4,10 @@
 <body>
     {% if alert == "empty_username" %}
         <div id="alertBox">Käyttäjätunnus ei voi olla tyhjä</div>
-    {% endif %}
-    {% if alert == "empty_password" %}
+    {% elif alert == "empty_password" %}
         <div id="alertBox">Salasana ei voi olla tyhjä</div>
+    {% elif alert == "username_taken" %}
+        <div id="alertBox">Käyttäjätunnus varattu, valitse toinen</div>
     {% endif %}
     <div class="centerWrap">
         <div class ="center">

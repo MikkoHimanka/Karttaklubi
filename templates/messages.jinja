@@ -11,7 +11,7 @@
 
                 {% macro msgsStart(x) -%}
                     {% if session.username == x[0] %}
-                        <div class="myMsgName">{{x[0]}}</div><div class="myMsg"></p>{{x[1]}}
+                        <div class="myMsgName">{{x[0]}}</div><div class="myMsg"><p>{{x[1]}}
                     {% else %}
                         <div class="msgName">{{x[0]}}</div><div class="msg"><p>{{x[1]}}
                     {% endif %}
@@ -36,24 +36,24 @@
                                 {% if loop.nextitem[0] == x[0] %}
                                     {{ msgsStart(x) }}
                                 {% else %}
-                                    {{ msgsStart(x) }}</div>
+                                    {{ msgsStart(x) }}</p></div>
                                 {% endif %}
                             {% endif %}
                         {% else %}
                             {% if loop.previtem[0] == x[0] %}
-                                {{ msgsMiddle(x) }}</div>
+                                {{ msgsMiddle(x) }}</p></div>
                             {% else %}
-                                {{ msgsStart(x) }}</div>
+                                {{ msgsStart(x) }}</p></div>
                             {% endif %}
                         {% endif %}                    
                     {% else %}
                         {% if messages | length == 1 %}
-                            {{ msgsStart(x) }}</div>
+                            {{ msgsStart(x) }}</p></div>
                         {% else %}
                             {% if loop.nextitem[0] == x[0] %}
                                 {{ msgsStart(x) }}
                             {% else %}
-                                {{ msgsStart(x) }}</div>
+                                {{ msgsStart(x) }}</p></div>
                             {% endif %}
                         {% endif %}
                     {% endif %}

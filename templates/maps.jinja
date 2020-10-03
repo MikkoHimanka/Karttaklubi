@@ -44,6 +44,17 @@
             <a href=/maps/new_column/{{mapcollection_id}}><button>Uusi sarake</button></a>
         </div>
     {% endif %}
+    {% if owner == session.user_id %}
+        {% if not public %}
+            <div class="buttons">
+                <button id="buttonPublic">Aseta kartta julkiseksi</button>
+            </div>
+        {% else %}
+            <div class="buttons">
+                <button id="buttonPublic">Aseta kartta yksityiseksi</button>
+            </div>
+        {% endif %}
+    {% endif %}
     </div>
     </div>
     </div>

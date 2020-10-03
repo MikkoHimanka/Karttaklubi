@@ -84,8 +84,15 @@ def newmap():
 
 @app.route("/maps/<int:map_id>")
 def maps(map_id):
-    map_query = "SELECT maps, name FROM mapcollections WHERE id=:map_id"
+    if not session:
+        return redirect("/")
+    
+    map_query = "SELECT maps, name, public, owner FROM mapcollections WHERE id=:map_id"
     map_result = db.session.execute(map_query, {"map_id": map_id}).fetchone()
+
+    if map_result[2] != True and map_result[3] != session["user_id"]:
+        return redirect("/")
+
     mapcollection= map_result[0]
     map_title = map_result[1]
     maps = []
@@ -99,7 +106,14 @@ def maps(map_id):
     msg_query = "SELECT u.username, m.message, m.id FROM messages m LEFT JOIN users u ON m.author = u.id WHERE owner_id=:id ORDER BY m.time DESC"
     msg_result = db.session.execute(msg_query, {"id":map_id}).fetchall()
 
-    return render_template("maps.jinja", mapcollection=mapcollection, submaps=maps, messages=msg_result, title=map_title, mapcollection_id=map_id)
+    return render_template("maps.jinja",
+        mapcollection=mapcollection,
+        submaps=maps,
+        messages=msg_result,
+        title=map_title,
+        mapcollection_id=map_id,
+        owner=map_result[3],
+        public=map_result[2])
 
 @app.route("/editor/<int:map_id>")
 def editor(map_id):
