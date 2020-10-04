@@ -8,8 +8,8 @@ db = SQLAlchemy(app)
 def new_msg(map_id):
     author = session["user_id"]
     msg = request.form["msg"]
-    submap = True if request.form["submap"] == "on" else False
-
+    submap = True if len(request.form) > 1 else False
+    
     sql = "INSERT INTO messages (author, message, owner_id, time, submap) VALUES (:author, :msg, :id, CURRENT_TIMESTAMP, :submap)"
     db.session.execute(sql, {"author":author, "msg":msg, "id":map_id, "submap":submap})
     db.session.commit()
