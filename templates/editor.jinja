@@ -10,28 +10,30 @@
         <div class="header">
         {% include "header.jinja" %}
         </div>
-    <div>
-    <div class="center">
-    <h1>EDITORI</h1>
-    </div>
+        <div style="display:flex; flex-direction: row;">
+        {% include "messages.jinja" %}
+            <div style="display: flex; flex-direction: column;">
+                <div class="center">
+                    <h1>EDITORI</h1>
+                </div>
 
-    <div class="editor">
-    <canvas id="canvas" width="64" height="64" class="canvas">Update your browser to support HTML5 Canvas</canvas>
-    <script>var data = JSON.parse({{ map_data | tojson }})</script>
+                <div class="editor">
+                    <canvas id="canvas" width="64" height="64" class="canvas">Update your browser to support HTML5 Canvas</canvas>
+                    <script>var data = JSON.parse({{ map_data | tojson }})</script>
 
-    <script src="{{ url_for('static', filename='map_canvas.js') }}"></script>
+                    <script src="{{ url_for('static', filename='map_canvas.js') }}"></script>
 
-    {% block savescript %}
-        <script>
-            function save() {
-                save_data = JSON.stringify(data)
-                $.post("/save_map", { data: save_data, id: {{map_id}} });
-            }
-        </script>
-    {% endblock %}
-    <button onclick="save()">Save</button>  
+                    {% block savescript %}
+                        <script>
+                            function save() {
+                                save_data = JSON.stringify(data)
+                                $.post("/save_map", { data: save_data, id: {{map_id}} });
+                            }
+                        </script>
+                    {% endblock %}
+                    <button onclick="save()">Save</button>  
+                </div>
+            </div>
+        </div>
     </div>
-    </div>
-    </div>
-
 </body>

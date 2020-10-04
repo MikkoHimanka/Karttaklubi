@@ -63,8 +63,13 @@
             </div>
         </div>
             <div class="msgTextArea">
-                <form action="/newmsg/{{mapcollection_id}}" method="POST">
+                <form action="/newmsg/{{msg_target_id}}" method="POST">
                 <input type="text" name="msg">
+                {% if parent %}
+                <input type="checkbox" name="submap" style="display: none;" checked>
+                {% else %}
+                <input type="checkbox" name="submap" style="display: none;">
+                {% endif %}
                 <input type="submit" value="->">
                 </form>
             </div>

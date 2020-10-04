@@ -4,6 +4,10 @@
     crossorigin="anonymous"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta id="mapdata" data-megadata="{{megadata}}" data-maps="{{maps}}">
+{% if alert == "empty_mapname" %}
+        <div id="alertBox">Aseta kartalle nimi!</div>
+{% endif %}
+<script src="{{ url_for('static', filename='alerts.js') }}"></script>
 <div class="centerWrap">
     <div class="center">
         <div>

@@ -8,7 +8,12 @@ db = SQLAlchemy(app)
 def new_msg(map_id):
     author = session["user_id"]
     msg = request.form["msg"]
-    sql = "INSERT INTO messages (author, message, owner_id, time) VALUES (:author, :msg, :id, CURRENT_TIMESTAMP)"
-    db.session.execute(sql, {"author":author, "msg":msg, "id":map_id})
+    submap = True if request.form["submap"] == "on" else False
+
+    sql = "INSERT INTO messages (author, message, owner_id, time, submap) VALUES (:author, :msg, :id, CURRENT_TIMESTAMP, :submap)"
+    db.session.execute(sql, {"author":author, "msg":msg, "id":map_id, "submap":submap})
     db.session.commit()
-    return redirect("/maps/"+str(map_id))
+    
+    if submap:
+        return redirect("/editor/" + str(map_id))
+    return redirect("/maps/" + str(map_id))

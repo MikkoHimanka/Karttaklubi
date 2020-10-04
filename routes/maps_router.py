@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template, json, request, redirect, session, make_response, url_for
+from flask import render_template, json, request, redirect, session, make_response, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy(app)
@@ -89,6 +89,8 @@ def maps(map_id):
     
     map_query = "SELECT maps, name, public, owner FROM mapcollections WHERE id=:map_id"
     map_result = db.session.execute(map_query, {"map_id": map_id}).fetchone()
+    if not map_result:
+        return redirect("/")
 
     if map_result[2] != True and map_result[3] != session["user_id"]:
         return redirect("/")
@@ -103,7 +105,7 @@ def maps(map_id):
             submap_result = db.session.execute(submap_query, {"submap_id":m}).fetchone()[1]
             maps.append(submap_result)
     
-    msg_query = "SELECT u.username, m.message, m.id FROM messages m LEFT JOIN users u ON m.author = u.id WHERE owner_id=:id ORDER BY m.time DESC"
+    msg_query = "SELECT u.username, m.message, m.id FROM messages m LEFT JOIN users u ON m.author = u.id WHERE owner_id=:id AND m.submap=False ORDER BY m.time ASC"
     msg_result = db.session.execute(msg_query, {"id":map_id}).fetchall()
 
     return render_template("maps.jinja",
@@ -113,12 +115,33 @@ def maps(map_id):
         title=map_title,
         mapcollection_id=map_id,
         owner=map_result[3],
-        public=map_result[2])
+        public=map_result[2],
+        navigation="maps",
+        msg_target_id=map_id)
 
 @app.route("/editor/<int:map_id>")
 def editor(map_id):
+    parent_query = "SELECT a.id FROM mapcollections a WHERE :id = ANY(a.maps)"
+    parent_res = db.session.execute(parent_query, {"id": map_id}).fetchone()
     map_query = "SELECT * FROM maps WHERE id=:id"
     res = db.session.execute(map_query, {"id": map_id}).fetchone()
     data = json.dumps(res[1])
 
-    return render_template("editor.jinja", map_data=data, map_id=map_id)
+    msg_query = "SELECT u.username, m.message, m.id FROM messages m LEFT JOIN users u ON m.author = u.id WHERE owner_id=:id AND submap=True ORDER BY m.time DESC"
+    msg_result = db.session.execute(msg_query, {"id":map_id}).fetchall()
+    
+    return render_template("editor.jinja",
+        map_data=data,
+        map_id=map_id,
+        navigation="editor",
+        parent=parent_res[0],
+        messages=msg_result,
+        msg_target_id=map_id)
+
+@app.route("/public/<int:map_id>", methods=["POST"])
+def public(map_id):
+    public_query = "UPDATE mapcollections SET public = NOT public WHERE id = :map_id"
+    db.session.execute(public_query, {"map_id": map_id})
+    db.session.commit()
+
+    return jsonify(success=True)

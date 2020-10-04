@@ -61,8 +61,8 @@ function execute() {
         container = canvas.getBoundingClientRect();
         ratio = container.height/canvas.height;
         
-        column = Math.floor((e.clientX - canvas.offsetLeft)/ratio);
-        row = Math.floor((e.clientY - canvas.offsetTop)/ratio) -25;
+        column = Math.floor((e.clientX - container.left)/ratio);
+        row = Math.floor((e.clientY - container.top)/ratio);
         
         targetIndex = column + (row*canvas.height);
         

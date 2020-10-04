@@ -1,5 +1,16 @@
-{% if alert == "empty_mapname" %}
-        <div id="alertBox">Aseta kartalle nimi!</div>
-{% endif %}
-    <script src="{{ url_for('static', filename='alerts.js') }}"></script>
-    <div style="display: flex;"><div style="margin-right: 20em;">Olet kirjautunut nimellä <b>{{ session.username }}</b></div><div><a href="/logout">Kirjaudu ulos</a></div></div>
+<div style="display: flex; flex-direction: row;">
+        <div style="margin-left: auto;">
+                <b>{{ session.username }}</b>
+        </div>
+        {% if navigation == "maps" %}
+        <div style="font-size:small; margin: auto 10em 0 10em;"><a href="/">Kartat</a></div>
+        {% elif navigation == "editor" %}
+        <div style="font-size:small; margin: auto 10em 0 10em;"><a href="/">Kartat</a> | <a href="/maps/{{parent}}">Koko kartta</a></div>
+        {% else %}
+        <div style="margin-left: 10em; margin-right: 10em;"></div>
+        {% endif %}
+        
+        <div style="margin-right: auto;">
+                <a href="/logout">Kirjaudu ulos</a>
+        </div>
+</div>
