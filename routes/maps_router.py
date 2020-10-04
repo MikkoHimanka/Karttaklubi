@@ -74,7 +74,7 @@ def newmap():
     
 
     
-    new_mapcollections_query = "INSERT INTO mapcollections (owner, maps, rows, name) VALUES (:user, ARRAY[:map_id], 1, :name)"
+    new_mapcollections_query = "INSERT INTO mapcollections (owner, maps, rows, name, public) VALUES (:user, ARRAY[:map_id], 1, :name, False)"
     mapcollection_id = db.session.execute(new_mapcollections_query, {"user": session["user_id"], "map_id": [map_id], "name": request.form["name"]})
     db.session.commit()
     
