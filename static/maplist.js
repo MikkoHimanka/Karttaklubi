@@ -9,12 +9,24 @@ function createImage(context, imageData) {
     for (let i = 0; i < jdata.length; i++) {
         dataEntity = jdata[i];
         if (dataEntity == 0) {
-            applyColor(imageData, i, [0,0,255]);
-        } else if (dataEntity <= 10) {
-            applyColor(imageData, i, [245,230,66]);
+            applyColor(i, [0, 182, 207]);
+        } else if (dataEntity <= 4) {
+            applyColor(i, [148, 218, 255]);
+        } else if (dataEntity <= 12) {
+            applyColor(i, [219, 207, 136]);
+        } else if (dataEntity <= 15) {
+            applyColor(i, [219, 204, 103]);
         } else if (dataEntity <= 20) {
-            applyColor(imageData, i, [72,117,8]);
-        }
+            applyColor(i, [176, 212, 99]);
+        } else if (dataEntity <= 25) {
+            applyColor(i, [125, 191, 54]);
+        } else if (dataEntity <= 50) {
+            applyColor(i, [55, 163, 16]);
+        } else if (dataEntity <= 7) {
+            applyColor(i, [115,115,115]);
+        } else if (dataEntity > 7) {
+            applyColor(i, [95,95,95]);
+        } 
         
     }
     context.putImageData(imageData, 0, 0);
