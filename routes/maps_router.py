@@ -21,7 +21,7 @@ def new_column(mapcollection_id):
     map_array = db.session.execute(map_array_query, {"mapcollection_id":mapcollection_id}).fetchone()
     map_new_array = map_array[2].copy()
 
-    data = [0] * 64 * 64
+    data = [0] * 256 * 256
     new_map_query = "INSERT INTO maps (mapdata, editable) VALUES (:data, true)"
     for i in range(map_array[4] - 1):
         new_map_query += ", (:data, true)"
@@ -45,7 +45,7 @@ def new_row(mapcollection_id):
     map_new_rows = map_array[4] + 1
     map_new_array = map_array[2].copy()
 
-    data = [0] * 64 * 64
+    data = [0] * 256 * 256
     new_map_query = "INSERT INTO maps (mapdata, editable) VALUES (:data, true)"
     for i in range(map_row_size - 1):
         new_map_query += ", (:data, true)"
@@ -68,7 +68,7 @@ def newmap():
         response.set_cookie("alert", "empty_mapname")
         return response
 
-    data = [0] * 64 * 64
+    data = [0] * 256 * 256
     new_map_query = "INSERT INTO maps (mapdata, editable) VALUES (:data, true) RETURNING id"
     map_id = db.session.execute(new_map_query, {"data":data}).fetchone()[0]
     
