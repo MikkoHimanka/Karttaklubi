@@ -2,14 +2,18 @@ document.addEventListener('DOMContentLoaded', (e) => {
     execute();
 });
 
+
+
 function execute() {
+    
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
     const imageData = context.createImageData(Math.sqrt(data.length), Math.sqrt(data.length));
     const brushTools = document.getElementById('brushTools');
     const smoothTools = document.getElementById('smoothTools');
-
-
+    const heightMapToggle = document.getElementById('toggleHeightMap');
+    const colorToggle = document.getElementById('toggleColor');
+    
     var showHeightMap = false;
     var prevMouse = [99999999,99999999];
     var hold;
@@ -20,8 +24,27 @@ function execute() {
     var carve;
     var flipped = false;
     var shift = false;
-    
     const cursor = document.getElementById("cursor");
+    
+    heightMapToggle.addEventListener('click', (e) => {
+        showHeightMap = true;
+        heightMapToggle.style.display = 'none';
+        colorToggle.style.display = 'block';
+
+        context.clearRect(0,0,canvas.width, canvas.height);
+        createHeightMap();
+        cursor.style.borderColor = "white";
+    });
+
+    colorToggle.addEventListener('click', (e) => {
+        showHeightMap = false;
+        heightMapToggle.style.display = 'block';
+        colorToggle.style.display = 'none';
+
+        context.clearRect(0,0,canvas.width, canvas.height);
+        createImage();
+        cursor.style.borderColor = "black";
+    });
 
     function applyColor(i, [r,g,b]) {
         imageData.data[4*i] = r;        //R
@@ -102,7 +125,7 @@ function execute() {
         return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
     }
 
-    function createImage() {
+    function createImage(data) {
         rowLength = Math.sqrt(data.length);
 
         for (let i = 0; i < data.length; i++) {
@@ -123,54 +146,47 @@ function execute() {
 
             normal = [(2*(v2-v1))/4, (2*(v4-v3))/4, -1];
             var color;
-
-            
-            
-            
-
-
-            
+   
             switch (true) {
                 case (dataEntity == 0):
                     color = [0, 182, 207];
                     break;
-                case (dataEntity < 5):
-                    color1 = RgbToHsl(0, 182, 207);
-                    color2 = RgbToHsl(148, 218, 255);
-                    color = HslToRgb(Interpolate(color1[0],color2[0], dataEntity, 4),
-                        Interpolate(color1[1], color2[1], dataEntity, 4),
-                        Interpolate(color1[2], color2[2], dataEntity, 4));
-                    break;
                 case (dataEntity < 10):
+                    color1 = RgbToHsl(0, 182, 207);
+                    color2 = RgbToHsl(141, 234, 246);
+                    color = HslToRgb(Interpolate(color1[0],color2[0], dataEntity, 4),
+                        Interpolate(color1[1], color2[1], dataEntity-1, 9),
+                        Interpolate(color1[2], color2[2], dataEntity-1, 9));
+                    break;
+                case (dataEntity < 20):
                     color1 = RgbToHsl(234, 223, 158);
                     color2 = RgbToHsl(219, 207, 136);
                     color = HslToRgb(Interpolate(color1[0],color2[0], dataEntity-4, 5),
-                        Interpolate(color1[1], color2[1], dataEntity-4, 5),
-                        Interpolate(color1[2], color2[2], dataEntity-4, 5));
+                        Interpolate(color1[1], color2[1], dataEntity-10, 10),
+                        Interpolate(color1[2], color2[2], dataEntity-10, 10));
                     break;
-                case (dataEntity < 25):
+                case (dataEntity < 50):
                     color1 = RgbToHsl(219, 207, 136);
                     color2 = RgbToHsl(125, 191, 54);
                     color = HslToRgb(Interpolate(color1[0],color2[0], dataEntity-10, 15),
-                        Interpolate(color1[1], color2[1], dataEntity-10, 15),
-                        Interpolate(color1[2], color2[2], dataEntity-10, 15));
+                        Interpolate(color1[1], color2[1], dataEntity-20, 30),
+                        Interpolate(color1[2], color2[2], dataEntity-20, 30));
                     break;
-                case (dataEntity < 50):
-                    //color1 = RgbToHsl(158, 163, 234);
+                case (dataEntity < 100):
+
                     color1 = RgbToHsl(125, 191, 54);
                     color2 = RgbToHsl(55, 163, 16);
                     color = HslToRgb(Interpolate(color1[0],color2[0], dataEntity-25, 25),
-                        Interpolate(color1[1], color2[1], dataEntity-25, 25),
-                        Interpolate(color1[2], color2[2], dataEntity-25, 25));
+                        Interpolate(color1[1], color2[1], dataEntity-50, 50),
+                        Interpolate(color1[2], color2[2], dataEntity-50, 50));
                     break;
                 case (dataEntity >= 50):
                     color = [255,255,255];
             }
 
             var normalSum = normal[0] + normal[1];
-
             
-            if ((dataEntity)) {
+            if ((dataEntity > 9)) {
                 color = [color[0]+normalSum*5,
                     color[1]+normalSum*5,
                     color[2]+normalSum*5]
@@ -180,7 +196,7 @@ function execute() {
         }
         context.putImageData(imageData, 0, 0);
     }
-    createImage();
+    createImage(data);
     
     document.onkeydown = function (e) {
         if (e.key == "Alt") {
@@ -361,7 +377,7 @@ function execute() {
         if (showHeightMap) {
             createHeightMap();
         } else {
-            createImage();
+            createImage(data);
         }
     }
 
@@ -386,7 +402,7 @@ function execute() {
                 if (editIndex >= 0 && editIndex < data.length && editRow == startRow+x) {
                     value = (size)/2 - Math.floor(size - Math.sqrt(Math.abs((x-size/2)**2 + (y-size/2)**2 - (size-size/4)**2)));
                     value += Math.floor(value * (Math.random()-0.5)*(noise/50));
-                    value = value < 0 ? 0 : value;
+                    value = value < 1 ? 0 : value;
 
                     data[editIndex] = (data[editIndex] + value * intensity < 0) ? 0 : data[editIndex] + value * intensity;
                 }
@@ -398,7 +414,7 @@ function execute() {
         if (showHeightMap) {
             createHeightMap();
         } else {
-            createImage();
+            createImage(data);
         }
     }
 }

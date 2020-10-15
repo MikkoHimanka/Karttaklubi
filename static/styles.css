@@ -218,3 +218,7 @@ div#title {
       display: none;
       width: 30vw;
   }
+
+  #toggleColor {
+      display: none;
+  }
