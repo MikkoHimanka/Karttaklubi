@@ -6,6 +6,9 @@ function execute() {
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
     const imageData = context.createImageData(Math.sqrt(data.length), Math.sqrt(data.length));
+    const brushTools = document.getElementById('brushTools');
+    const smoothTools = document.getElementById('smoothTools');
+
 
     var showHeightMap = false;
     var prevMouse = [99999999,99999999];
@@ -14,7 +17,10 @@ function execute() {
     var flow;
     var intensity;
     var noise;
-
+    var carve;
+    var flipped = false;
+    var shift = false;
+    
     const cursor = document.getElementById("cursor");
 
     function applyColor(i, [r,g,b]) {
@@ -31,6 +37,8 @@ function execute() {
         }
         context.putImageData(imageData, 0, 0);
     } 
+
+
 
     function createImage() {
         rowLength = Math.sqrt(data.length);
@@ -88,39 +96,91 @@ function execute() {
     }
     createImage();
     
+    document.onkeydown = function (e) {
+        if (e.key == "Alt") {
+            flipped = true;
+        }
+        if (e.key == "Shift" && !flipped) {
+            shift = true;
+
+            brushTools.style.display = 'none';
+            smoothTools.style.display = 'block';
+        }
+    }
+
+    document.onkeyup = function (e) {
+        if (e.key == "Alt") {
+            flipped = false;
+        }
+        if (e.key == "Shift") {
+            shift = false;
+
+            brushTools.style.display = 'block';
+            smoothTools.style.display = 'none';
+        }
+    }
+
+
     canvas.onmousedown = function (e) {
-        flow = document.getElementById('flow').value/100;
-        size = document.getElementById('size').value/1;
-        intensity = document.getElementById('intensity').value/100;
-        noise = document.getElementById('noise').value/1;
+
+        if (!shift) {
+            flow = document.getElementById('brushFlow').value/100;
+            size = document.getElementById('brushSize').value/1;
+            carve = document.getElementById('carve').checked;
+            intensity = document.getElementById('brushIntensity').value/100;
+            noise = document.getElementById('brushNoise').value/1;
+        } else {
+            intensity = document.getElementById('smoothIntensity').value/100;
+            size = document.getElementById('smoothSize').value/1;
+            flow = document.getElementById('smoothFlow').value/100;
+            noise = 0;
+            carve = false;
+        }
+
+        if (carve) {
+            intensity *= -1;
+        }
         
-        draw(e, size, intensity, noise);
+        if (flipped) {
+            intensity *= -1;
+        }
+
+        if (!shift) {
+            draw(e, size, intensity, noise);
+        } else {
+            smooth(e, size, intensity);
+        } 
         hold = true;
     }
 
     canvas.onmousemove = function (e) {
-        cursorSize = document.getElementById('size').value/1;
+        if (!shift) {
+            cursorSize = document.getElementById('brushSize').value/1;
+        } else {
+            cursorSize = document.getElementById('smoothSize').value/1;
+        }
+        cursor.style.width = cursorSize*2+4 + "px";
+        cursor.style.height = cursorSize*2+4 + "px";
         container = canvas.getBoundingClientRect();
         ratio = container.height/canvas.height;
 
-        if (cursor.style.display == "hidden") {
-            cursor.style.display = "block";
-        }
-        cursor.style.transform = `translate(${e.clientX - (cursorSize + 1)}px, ${e.clientY - (cursorSize + 1)}px)`;
+        cursor.style.transform = `translate(${e.clientX - cursorSize + 1}px, ${e.clientY - cursorSize + 1}px`;
 
         movedEnough = (Math.abs(Math.floor((e.clientX - container.left)) - Math.floor((prevMouse[0] - container.left))) > ratio/flow) ||
             (Math.abs(Math.floor((e.clientY - container.top)) - Math.floor((prevMouse[1] - container.top))) > ratio/flow);
 
         if (hold && movedEnough) {
             prevMouse = [e.clientX, e.clientY]
-            draw(e, size, intensity, noise);
+            if (!shift) {
+                draw(e, size, intensity, noise);
+            } else {
+                smooth(e, size, intensity);
+            }
         }
     }
 
     canvas.onmouseenter = function (e) {
-        cursorSize = document.getElementById('size').value * 2 + 2;
-        cursor.style.width = cursorSize + "px";
-        cursor.style.height = cursorSize + "px";
+
         cursor.style.display = "block";
     }
 
@@ -132,6 +192,57 @@ function execute() {
         hold = false;
     }
 
+
+    function smooth(e, size, intensity) {
+        var container = canvas.getBoundingClientRect();
+        var ratio = container.height/canvas.height;
+        
+        var column = Math.floor((e.clientX - container.left)/ratio);
+        var row = Math.floor((e.clientY - container.top)/ratio);
+
+        var startRow = row - Math.floor(size/2-1);
+        var startColumn = column - Math.floor(size/2-1)
+
+        var targetIndex = column + (row*canvas.height);
+
+        var average = 0
+
+        for (var y = 0; y < (size+1); y++) {
+            for (var x = 0; x < (size+1); x++) {
+                var editIndex = (startColumn + y) + ((startRow + x)*canvas.height);
+                var editRow = Math.floor(editIndex/canvas.height);
+                if (editIndex >= 0 && editIndex < data.length && editRow == startRow+x) {
+                    average += data[editIndex];
+                }
+            }
+        }
+
+        average = Math.round(average/(size+1)**2);
+
+        for (var y = 0; y < (size+1); y++) {
+            for (var x = 0; x < (size+1); x++) {
+                var editIndex = (startColumn + y) + ((startRow + x)*canvas.height);
+                var editRow = Math.floor(editIndex/canvas.height);
+                if (editIndex >= 0 && editIndex < data.length && editRow == startRow+x) {
+                    value = size/2 - Math.floor(size - Math.sqrt(Math.abs((x-size/2)**2 + (y-size/2)**2 - (size-size/4)**2)));
+                    value = value < 1 ? 0 : value;
+                    maxValue = size/2 - Math.floor(size - Math.sqrt(Math.abs((size/4)**2 + (size/4)**2 - (size-size/8)**2)));
+
+                    
+                    data[editIndex] += (average - data[editIndex]) * intensity/100 * (value/(maxValue));
+                    data[editIndex] = Math.floor(data[editIndex]);
+                }
+            }
+        }
+
+        context.clearRect(0,0,canvas.width, canvas.height);
+        
+        if (showHeightMap) {
+            createHeightMap();
+        } else {
+            createImage();
+        }
+    }
 
     function draw(e, size, intensity, noise) {
 
@@ -150,10 +261,15 @@ function execute() {
         for (var y = 0; y < (size+1); y++) {
             for (var x = 0; x < (size+1); x++) {
                 var editIndex = (startColumn + y) + ((startRow + x)*canvas.height);
-                if (editIndex >= 0 && editIndex < data.length) {
-                    value = size/2 - Math.floor(size - Math.sqrt(Math.abs((x-size/2)**2 + (y-size/2)**2 - (size-size/4)**2)));
-                    value += Math.round(value * (Math.random()-0.5)*(noise/50));
+                var editRow = Math.floor(editIndex/canvas.height);
+                if (editIndex >= 0 && editIndex < data.length && editRow == startRow+x) {
+                    value = (size)/2 - Math.floor(size - Math.sqrt(Math.abs((x-size/2)**2 + (y-size/2)**2 - (size-size/4)**2)));
+                    console.log(value)
+                    value += Math.floor(value * (Math.random()-0.5)*(noise/50));
+                    console.log(value)
                     value = value < 0 ? 0 : value;
+                    console.log(value)
+
 
                     data[editIndex] = (data[editIndex] + value * intensity < 0) ? 0 : data[editIndex] + value * intensity;
                 }

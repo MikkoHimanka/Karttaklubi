@@ -34,10 +34,18 @@
                     {% endblock %}
                     <button onclick="save()">Save</button>  
                     <div class="tools">
-                        Flow: <input type="range" min="0" max="100" value="30" class="slider" id="flow">
-                        Size: <input type="range" min="1" max="50" value="25" class="slider" id="size">
-                        Intensity: <input type="range" min="1" max="100" value="50" class="slider" id="intensity">
-                        Noise: <input type="range" min="0" max="100" value="0" class="slider" id="noise">
+                        <div class="brush" id="brushTools">
+                            Flow: <input type="range" min="0" max="100" value="30" class="slider" id="brushFlow">
+                            Size: <input type="range" min="1" max="50" value="25" class="slider" id="brushSize">
+                            Intensity: <input type="range" min="1" max="100" value="50" class="slider" id="brushIntensity">
+                            Noise: <input type="range" min="0" max="100" value="0" class="slider" id="brushNoise">
+                            <input type="checkbox" id="carve" unchecked><label>Carve</label>
+                        </div>
+                        <div class="smooth" id="smoothTools">
+                            Flow: <input type="range" min="0" max="100" value="30" class="slider" id="smoothFlow">
+                            Size: <input type="range" min="1" max="50" value="25" class="slider" id="smoothSize">
+                            Intensity: <input type="range" min="1" max="100" value="50" class="slider" id="smoothIntensity">
+                        </div>
                     </div>
                 </div>
             </div>

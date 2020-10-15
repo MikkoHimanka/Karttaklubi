@@ -208,3 +208,13 @@ div#title {
       border: 1px solid black;
       pointer-events: none;
   }
+
+  .brush {
+      display: block;
+      width: 30vw;
+  }
+
+  .smooth {
+      display: none;
+      width: 30vw;
+  }
