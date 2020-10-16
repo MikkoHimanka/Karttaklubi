@@ -139,62 +139,6 @@ function createImage(data, context, imageData) {
     context.putImageData(imageData, 0, 0);
 }
 
-// function createImage(context, imageData) {
-//     rowLength = Math.sqrt(jdata.length);
-
-//     for (let i = 0; i < jdata.length; i++) {
-//         dataEntity = jdata[i];
-
-//         v1 = i-1 < 0 ?
-//             dataEntity - (jdata[i+1] - dataEntity) :
-//             jdata[i-1];
-//         v2 = i+1 >= jdata.length ?
-//             dataEntity - (jdata[i-1] - dataEntity) :
-//             jdata[i+1];
-//         v3 = i-rowLength < 0 ? 
-//             dataEntity - (jdata[i+rowLength] - dataEntity) :
-//             jdata[i-rowLength];
-//         v4 = i+rowLength >= data.length ?
-//             dataEntity - (jdata[i-rowLength] - dataEntity) :
-//             jdata[i+rowLength]
-
-//         normal = [(2*(v2-v1))/4, (2*(v4-v3))/4, -1];
-//         var color;
-
-//         if (dataEntity == 0) {
-//             color = [0, 182, 207];
-//         } else if (dataEntity <= 4) {
-//             color = [148, 218, 255];
-//         } else if (dataEntity <= 12) {
-//             color = [219, 207, 136];
-//         } else if (dataEntity <= 15) {
-//             color = [219, 204, 103];
-//         } else if (dataEntity <= 20) {
-//             color = [176, 212, 99];
-//         } else if (dataEntity <= 25) {
-//             color = [125, 191, 54];
-//         } else if (dataEntity <= 50) {
-//             color = [55, 163, 16];
-//         } else if (dataEntity <= 7) {
-//             color = [115,115,115];
-//         } else {
-//             color = [95,95,95];
-//         } 
-        
-//         var normalSum = normal[0] + normal[1];
-
-//         if ((normalSum < 0) && dataEntity > 4) {
-//             color = [color[0]+normalSum*5,
-//                 color[1]+normalSum*5,
-//                 color[2]+normalSum*5]
-//         }
-        
-//         applyColor(imageData, i, color);
-//     }
-//     context.putImageData(imageData, 0, 0);
-// };
-
-
 var indeksi = 0;
 var data = $('#mapdata').data();
 var mapcollection = data.mapcollection;

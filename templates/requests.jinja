@@ -1,0 +1,21 @@
+<meta id="requestsData" data-requests="{{requests}}" >
+
+<div style="position: absolute; margin-top: 2em; text-align: right; top: 10vh; right: 2em;">
+    <p style="font-weight:bold;text-decoration:underline;margin:0;">Kaverit</p>
+    {% if friends | count > 0 %}
+    {% for x in friends %}
+        <a href="/users/{{x[0]}}">{{x[1]}}</a>
+    {% endfor %}
+    {% endif %}
+    {% if requests | count > 0 %}
+        <div style="margin-top:0.5em; margin-right:0;" >{{requests | count}} kaveripyyntöä:</div>
+        {% for r in requests %}
+        <div><b>{{r[1]}}</b> - <a href="/frequest/accept/{{r[0]}}">Hyväksy</a> | <a href="/frequest/decline/{{r[0]}}">Hylkää</a></div>
+        {% endfor %}
+    {% endif %}
+    <div style="margin-top: 3em; font-weight: bold;">Lisää kaveri:</div>
+    <div>
+        <input type="text">
+        <input type="submit" value=">">
+    </div>
+</div>

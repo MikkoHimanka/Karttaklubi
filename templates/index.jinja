@@ -8,7 +8,10 @@
         <div class="header">
             {% include "header.jinja" %}
         </div>
+        <div style="display: flex; flex-direction: row;">
             {% include "alku.jinja" %}
+            {% include "requests.jinja" %}
+        </div>
         {% else %}
             {% include "login.jinja" %}
         {% endif %}

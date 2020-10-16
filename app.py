@@ -13,3 +13,4 @@ app.secret_key = getenv("SECRET_KEY")
 import routes.user_router
 import routes.maps_router
 import routes.messages_router
+import routes.friends_router

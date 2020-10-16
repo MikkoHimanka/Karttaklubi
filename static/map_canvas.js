@@ -27,7 +27,12 @@ function execute() {
     var shift = false;
     const cursor = document.getElementById("cursor");
     var objects = [];
-    var testi = document.getElementById("bush");
+    const bushes = [document.getElementById("bush"),
+        document.getElementById("bush2"),
+        document.getElementById("bush3")];
+    const trees = [document.getElementById("tree"),
+        document.getElementById("tree2"),
+        document.getElementById("tree3")];
     
     heightMapToggle.addEventListener('click', (e) => {
         showHeightMap = true;
@@ -196,7 +201,8 @@ function execute() {
             var random = prng();
 
             if (random > 0.98 && Math.abs(normalSum) < 0.2 && dataEntity > 10 && dataEntity < 100) {
-                objects.push([i/Math.sqrt(data.length), i%Math.sqrt(data.length), random*100-100, dataEntity]);
+                objects.push([i/Math.sqrt(data.length), i%Math.sqrt(data.length), random*100-98]);
+                //color = [255,0,0]
             }
             
             applyColor(i, color);
@@ -207,9 +213,7 @@ function execute() {
             context.save();
             context.translate(objects[i][1],objects[i][0]);
             context.rotate(Math.PI*2*objects[i][2]);
-            if (objects[i][3] < 20) {
-                context.drawImage(testi, -4, -4, 8, 8);
-            }
+            context.drawImage(bushes[Math.floor(objects[i][2]/2*3)], -4, -4, 8, 8);
             context.restore();
         }
     }
@@ -410,8 +414,11 @@ function execute() {
                     value = (size)/2 - Math.floor(size - Math.sqrt(Math.abs((x-size/2)**2 + (y-size/2)**2 - (size-size/4)**2)));
                     value += Math.floor(value * (Math.random()-0.5)*(noise/50));
                     value = value < 1 ? 0 : value;
-
                     data[editIndex] = Math.floor(data[editIndex] + value * intensity);
+                    if (flipped) {
+                        data[editIndex] = data[editIndex] < 0 ? 0 : data[editIndex];
+                    }
+
                 }
             }
         }

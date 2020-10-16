@@ -16,22 +16,21 @@ def index():
 
         public_maps_query = "SELECT a.id, a.name, b.username, a.maps FROM mapcollections a LEFT JOIN users b ON b.id=a.owner WHERE public=True ORDER BY a.id"
         public_maps_result = db.session.execute(public_maps_query).fetchall()
+               
+        requests_query = "SELECT r.id, u.username FROM requests r LEFT JOIN users u ON r.sender=u.id WHERE receiver=:user_id"
+        requests_result = db.session.execute(requests_query, {"user_id": session["user_id"]}).fetchall()
 
-
-        megadata = []
-        megadata_query = "SELECT id, mapdata FROM maps WHERE id=:id"
-
-        for i in range(len(maps)):
-            for j in range(len(maps[i][2])):
-                megadata_result = db.session.execute(megadata_query, {"id": maps[i][2][j][0]}).fetchall()
-                megadata.append(megadata_result)
-                
+        friends_query = "SELECT b.id, b.username FROM users a LEFT JOIN users b ON b.id= ANY(a.friends) WHERE a.id=:user_id"
+        friends = db.session.execute(friends_query, {"user_id": session["user_id"]}).fetchall()
+        if friends[0][0] == None:
+            friends = []
         return render_template("index.jinja",
             maps=maps,
             userid=session["user_id"],
             alert=alert,
-            megadata=megadata,
-            publicMaps=public_maps_result)
+            publicMaps=public_maps_result,
+            requests=requests_result,
+            friends=friends)
     else:
 
         return render_template("index.jinja", alert=alert)
