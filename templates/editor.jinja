@@ -4,6 +4,7 @@
     src="https://code.jquery.com/jquery-3.5.1.js"
     integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
     crossorigin="anonymous"></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/seedrandom/2.3.10/seedrandom.min.js></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <body>
     <div class="siteWrap">
@@ -18,10 +19,13 @@
                 </div>
 
                 <div class="editor">
+                <div class="objects" style="display: none;">
+                    <img src="{{ url_for('static', filename='Objects/bush.png') }}" id="bush" />
+                </div>
                     <div class="cursor" id="cursor"></div>
                     <canvas id="canvas" width="256" height="256" class="canvas">Update your browser to support HTML5 Canvas</canvas>
                     <script>var data = JSON.parse({{ map_data | tojson }})</script>
-
+                    <script>const seed = {{map_id}} </script>
                     <script src="{{ url_for('static', filename='map_canvas.js') }}"></script>
 
                     {% block savescript %}

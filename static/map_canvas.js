@@ -1,8 +1,6 @@
-document.addEventListener('DOMContentLoaded', (e) => {
+window.addEventListener('load', (e) => {
     execute();
 });
-
-
 
 function execute() {
     
@@ -13,6 +11,9 @@ function execute() {
     const smoothTools = document.getElementById('smoothTools');
     const heightMapToggle = document.getElementById('toggleHeightMap');
     const colorToggle = document.getElementById('toggleColor');
+
+    const container = canvas.getBoundingClientRect();
+    const ratio = container.height/canvas.height;
     
     var showHeightMap = false;
     var prevMouse = [99999999,99999999];
@@ -25,6 +26,8 @@ function execute() {
     var flipped = false;
     var shift = false;
     const cursor = document.getElementById("cursor");
+    var objects = [];
+    var testi = document.getElementById("bush");
     
     heightMapToggle.addEventListener('click', (e) => {
         showHeightMap = true;
@@ -42,7 +45,8 @@ function execute() {
         colorToggle.style.display = 'none';
 
         context.clearRect(0,0,canvas.width, canvas.height);
-        createImage();
+        var prng = new Math.seedrandom(seed);
+        createImage(data, prng);
         cursor.style.borderColor = "black";
     });
 
@@ -51,8 +55,6 @@ function execute() {
         imageData.data[4*i + 1] = g;    //G
         imageData.data[4*i + 2] = b;    //B
         imageData.data[4*i + 3] = 255;  //A
-
-
     }
 
     function createHeightMap() {
@@ -67,11 +69,17 @@ function execute() {
         return (value2 - value1) * step / steps + value1;
     }
 
-    function RgbToHsl(r,g,b) {
+    function Interpolate2Colors(color1, color2, step, steps) {
+        return [Interpolate(color1[0],color2[0], step, steps),
+            Interpolate(color1[1], color2[1], step, steps),
+            Interpolate(color1[2], color2[2], step, steps)];
+    }
+
+    function RgbToHsl(arr) {
         //From wikipedia
-        r /= 255;
-        g /= 255;
-        b /= 255;
+        r = arr[0]/255;
+        g = arr[1]/255;
+        b = arr[2]/255;
 
         var max = Math.max(r,g,b);
         var min = Math.min(r,g,b);
@@ -95,11 +103,10 @@ function execute() {
         return [(h*360), (s*100), (l*100)];
     }
 
-    function HslToRgb(h, s, l){
-        //From wikipedia
-        h /= 360;
-        s /= 100;
-        l /= 100;
+    function HslToRgb(arr){
+        h = arr[0]/360;
+        s = arr[1]/100;
+        l = arr[2]/100;
 
         var r, g, b;
     
@@ -125,8 +132,9 @@ function execute() {
         return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
     }
 
-    function createImage(data) {
+    function createImage(data, prng) {
         rowLength = Math.sqrt(data.length);
+        objects = [];
 
         for (let i = 0; i < data.length; i++) {
             dataEntity = data[i];
@@ -152,36 +160,29 @@ function execute() {
                     color = [0, 182, 207];
                     break;
                 case (dataEntity < 10):
-                    color1 = RgbToHsl(0, 182, 207);
-                    color2 = RgbToHsl(141, 234, 246);
-                    color = HslToRgb(Interpolate(color1[0],color2[0], dataEntity, 4),
-                        Interpolate(color1[1], color2[1], dataEntity-1, 9),
-                        Interpolate(color1[2], color2[2], dataEntity-1, 9));
+                    color1 = RgbToHsl([0, 182, 207]);
+                    color2 = RgbToHsl([141, 234, 246]);
+                    color = HslToRgb(Interpolate2Colors(color1, color2, dataEntity-1, 9));
                     break;
                 case (dataEntity < 20):
-                    color1 = RgbToHsl(234, 223, 158);
-                    color2 = RgbToHsl(219, 207, 136);
-                    color = HslToRgb(Interpolate(color1[0],color2[0], dataEntity-4, 5),
-                        Interpolate(color1[1], color2[1], dataEntity-10, 10),
-                        Interpolate(color1[2], color2[2], dataEntity-10, 10));
+                    color1 = RgbToHsl([234, 223, 158]);
+                    color2 = RgbToHsl([219, 207, 136]);
+                    color = HslToRgb(Interpolate2Colors(color1, color2, dataEntity-10, 10));
                     break;
                 case (dataEntity < 50):
-                    color1 = RgbToHsl(219, 207, 136);
-                    color2 = RgbToHsl(125, 191, 54);
-                    color = HslToRgb(Interpolate(color1[0],color2[0], dataEntity-10, 15),
-                        Interpolate(color1[1], color2[1], dataEntity-20, 30),
-                        Interpolate(color1[2], color2[2], dataEntity-20, 30));
+                    color1 = RgbToHsl([219, 207, 136]);
+                    color2 = RgbToHsl([125, 191, 54]);
+                    color = HslToRgb(Interpolate2Colors(color1, color2, dataEntity-20, 30));
                     break;
                 case (dataEntity < 100):
 
-                    color1 = RgbToHsl(125, 191, 54);
-                    color2 = RgbToHsl(55, 163, 16);
-                    color = HslToRgb(Interpolate(color1[0],color2[0], dataEntity-25, 25),
-                        Interpolate(color1[1], color2[1], dataEntity-50, 50),
-                        Interpolate(color1[2], color2[2], dataEntity-50, 50));
+                    color1 = RgbToHsl([125, 191, 54]);
+                    color2 = RgbToHsl([55, 163, 16]);
+                    color = HslToRgb(Interpolate2Colors(color1, color2, dataEntity-50, 50));
                     break;
-                case (dataEntity >= 50):
+                case (dataEntity >= 100):
                     color = [255,255,255];
+                    break;
             }
 
             var normalSum = normal[0] + normal[1];
@@ -192,11 +193,28 @@ function execute() {
                     color[2]+normalSum*5]
             }
 
+            var random = prng();
+
+            if (random > 0.98 && Math.abs(normalSum) < 0.2 && dataEntity > 10 && dataEntity < 100) {
+                objects.push([i/Math.sqrt(data.length), i%Math.sqrt(data.length), random*100-100, dataEntity]);
+            }
+            
             applyColor(i, color);
+            
         }
         context.putImageData(imageData, 0, 0);
+        for (var i in objects) {
+            context.save();
+            context.translate(objects[i][1],objects[i][0]);
+            context.rotate(Math.PI*2*objects[i][2]);
+            if (objects[i][3] < 20) {
+                context.drawImage(testi, -4, -4, 8, 8);
+            }
+            context.restore();
+        }
     }
-    createImage(data);
+    var prng = new Math.seedrandom(seed);
+    createImage(data, prng);
     
     document.onkeydown = function (e) {
         if (e.key == "Alt") {
@@ -221,7 +239,6 @@ function execute() {
             smoothTools.style.display = 'none';
         }
     }
-
 
     canvas.onmousedown = function (e) {
 
@@ -263,8 +280,6 @@ function execute() {
         }
         cursor.style.width = cursorSize*2+4 + "px";
         cursor.style.height = cursorSize*2+4 + "px";
-        container = canvas.getBoundingClientRect();
-        ratio = container.height/canvas.height;
 
         cursor.style.transform = `translate(${e.clientX - cursorSize + 1}px, ${e.clientY - cursorSize + 1}px`;
 
@@ -279,15 +294,6 @@ function execute() {
                 smooth(e, size, intensity);
             }
         }
-
-        //
-        container = canvas.getBoundingClientRect();
-        ratio = container.height/canvas.height;
-        
-        column = Math.floor((e.clientX - container.left)/ratio);
-        row = Math.floor((e.clientY - container.top)/ratio);
-        targetIndex = column + (row*canvas.height);
-        console.log()
     }
 
     canvas.onmouseenter = function (e) {
@@ -366,7 +372,7 @@ function execute() {
                     value = value < 1 ? 0 : value;
                     maxValue = size/2 - Math.floor(size - Math.sqrt(Math.abs((size/4)**2 + (size/4)**2 - (size-size/8)**2)));
                     
-                    data[editIndex] += (average - data[editIndex]) * intensity/100 * (value/(maxValue));
+                    data[editIndex] += (average - data[editIndex]) * intensity * (value/(maxValue));
                     data[editIndex] = Math.floor(data[editIndex]);
                 }
             }
@@ -374,17 +380,18 @@ function execute() {
 
         context.clearRect(0,0,canvas.width, canvas.height);
         
+        var prng = new Math.seedrandom(seed);
+
         if (showHeightMap) {
             createHeightMap();
         } else {
-            createImage(data);
+            createImage(data, prng);
         }
     }
 
     function draw(e, size, intensity, noise) {
 
-        container = canvas.getBoundingClientRect();
-        ratio = container.height/canvas.height;
+
         
         column = Math.floor((e.clientX - container.left)/ratio);
         row = Math.floor((e.clientY - container.top)/ratio);
@@ -404,17 +411,24 @@ function execute() {
                     value += Math.floor(value * (Math.random()-0.5)*(noise/50));
                     value = value < 1 ? 0 : value;
 
-                    data[editIndex] = (data[editIndex] + value * intensity < 0) ? 0 : data[editIndex] + value * intensity;
+                    data[editIndex] = Math.floor(data[editIndex] + value * intensity);
                 }
             }
         }
 
+        context.save();
+        context.setTransform(1,0,0,1,0,0);
         context.clearRect(0,0,canvas.width, canvas.height);
+        context.restore();
         
+        var prng = new Math.seedrandom(seed);
+
         if (showHeightMap) {
             createHeightMap();
         } else {
-            createImage(data);
+            createImage(data, prng);
+
         }
     }
+
 }
