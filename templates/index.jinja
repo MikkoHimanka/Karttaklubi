@@ -9,6 +9,9 @@
             {% include "header.jinja" %}
         </div>
         <div style="display: flex; flex-direction: row;">
+            {% if alert == "no_friend" %}
+                <div id="alertBox">Käyttäjää ei löytynyt</div>
+            {% endif %}
             {% include "alku.jinja" %}
             {% include "requests.jinja" %}
         </div>

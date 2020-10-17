@@ -29,3 +29,28 @@ def decline(req_id):
     db.session.commit()
 
     return redirect("/")
+
+@app.route("/user/<int:friend_id>")
+def user(friend_id):
+    user_query = "SELECT a.friends FROM users a LEFT JOIN users b ON b.id=ANY(a.friends) WHERE a.id=:user_id AND b.id=:friend_id"
+    user_res = db.session.execute(user_query, {"friend_id": friend_id, "user_id": session["user_id"]}).fetchone()
+    print(user_res)
+
+
+    if user_res != None:
+        return render_template("user.jinja")
+    else:
+        response = make_response(redirect("/"))
+        response.set_cookie("alert", "no_friend")
+        return response
+    
+@app.route("/addfrequest/", methods=["POST"])
+def addfrequest():
+    friend_name = request.form["name"]
+    user_query = "SELECT id FROM users WHERE username=:friend_name"
+    user_res = db.session.execute(user_query, {"friend_name": friend_name}).fetchone()
+
+    if user.res != None:
+        print("löytyi")
+
+    return
