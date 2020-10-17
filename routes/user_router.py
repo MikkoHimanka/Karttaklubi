@@ -32,7 +32,6 @@ def index():
             requests=requests_result,
             friends=friends)
     else:
-
         return render_template("index.jinja", alert=alert)
 
 @app.route("/login", methods=["POST"])

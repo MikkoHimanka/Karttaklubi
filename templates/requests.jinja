@@ -4,7 +4,7 @@
     <p style="font-weight:bold;text-decoration:underline;margin:0;">Kaverit</p>
     {% if friends | count > 0 %}
     {% for x in friends %}
-        <a href="/user/{{x[0]}}">{{x[1]}}</a>
+        <a href="/user/{{x[0]}}">{{x[1]}}</a><br />
     {% endfor %}
     {% endif %}
     {% if requests | count > 0 %}

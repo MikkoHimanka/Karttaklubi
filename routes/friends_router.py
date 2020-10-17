@@ -23,6 +23,9 @@ def accept(req_id):
 
 @app.route("/frequest/decline/<int:req_id>")
 def decline(req_id):
+    if not session:
+        return redirect("/")
+
     del_req_query = "DELETE FROM requests WHERE id=:req_id"
     db.session.execute(del_req_query, {"req_id": req_id})
     db.session.commit()
@@ -31,6 +34,9 @@ def decline(req_id):
 
 @app.route("/user/<int:friend_id>")
 def user(friend_id):
+    if not session:
+        return redirect("/")
+
     user_query = "SELECT b.username FROM users a LEFT JOIN users b ON b.id=ANY(a.friends) WHERE a.id=:user_id AND b.id=:friend_id"
     user_res = db.session.execute(user_query, {"friend_id": friend_id, "user_id": session["user_id"]}).fetchone()
     if user_res != None:
@@ -47,6 +53,9 @@ def user(friend_id):
     
 @app.route("/addfrequest", methods=["POST"])
 def addfrequest():
+    if not session:
+        return redirect("/")
+
     friend_name = request.form["name"]
     user_query = "SELECT id FROM users WHERE username=:friend_name"
     user_res = db.session.execute(user_query, {"friend_name": friend_name}).fetchone()
@@ -61,7 +70,7 @@ def addfrequest():
             frequest_already_query2 = "SELECT id FROM requests WHERE sender=:sender AND receiver=:receiver"
             frequest_already_res2 = db.session.execute(frequest_already_query, {"sender": user_res[0], "receiver": session["user_id"]}).fetchone()
 
-            if frequest_already_res == None and frequest_already_query2 == None:
+            if frequest_already_res == None and frequest_already_res2 == None:
                 frequest_query = "INSERT INTO requests (sender, receiver) VALUES (:sender, :receiver)"
                 frequest_res = db.session.execute(frequest_query, {"sender": session["user_id"], "receiver": user_res[0]})
                 db.session.commit()

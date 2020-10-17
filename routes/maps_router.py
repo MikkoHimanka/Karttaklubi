@@ -2,7 +2,28 @@ from app import app
 from flask import render_template, json, request, redirect, session, make_response, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 
+import threading
+import time
+
 db = SQLAlchemy(app)
+
+class timeThread(threading.Thread):
+    def __init__(self):
+        super(timeThread, self).__init__()
+        self._stopper = threading.Event()
+
+    def stopit(self):
+        self._stopper.set()
+
+    def stopped(self):
+        return self._stopper.isSet()
+    
+    def run(self):
+        while True:
+            if self.stopped():
+                return
+            print("AAAAA")
+            time.sleep(1)
 
 @app.route("/save_map", methods=["POST"])
 def savemap():
@@ -157,6 +178,11 @@ def editor(map_id):
         msg_query = "SELECT u.username, m.message, m.id FROM messages m LEFT JOIN users u ON m.author = u.id WHERE owner_id=:id AND submap=True ORDER BY m.time DESC"
         msg_result = db.session.execute(msg_query, {"id":map_id}).fetchall()
 
+        event = threading.Event()
+        threadi = timeThread()
+        threadi.start()
+        threadi.join()
+        
         return render_template("editor.jinja",
             map_data=data,
             map_id=map_id,
