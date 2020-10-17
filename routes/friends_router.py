@@ -19,7 +19,6 @@ def accept(req_id):
         db.session.execute(del_req_query, {"req_id": req_id})
         db.session.commit()
 
-
     return redirect("/")
 
 @app.route("/frequest/decline/<int:req_id>")
@@ -32,25 +31,57 @@ def decline(req_id):
 
 @app.route("/user/<int:friend_id>")
 def user(friend_id):
-    user_query = "SELECT a.friends FROM users a LEFT JOIN users b ON b.id=ANY(a.friends) WHERE a.id=:user_id AND b.id=:friend_id"
+    user_query = "SELECT b.username FROM users a LEFT JOIN users b ON b.id=ANY(a.friends) WHERE a.id=:user_id AND b.id=:friend_id"
     user_res = db.session.execute(user_query, {"friend_id": friend_id, "user_id": session["user_id"]}).fetchone()
-    print(user_res)
-
-
     if user_res != None:
-        return render_template("user.jinja")
+        shared_maps_query = "SELECT id, name FROM mapcollections WHERE owner=:user_id AND shared=true"
+        shared_maps_res = db.session.execute(shared_maps_query, {"user_id": friend_id}).fetchall()
+        public_maps_query = "SELECT id, name FROM mapcollections WHERE owner=:user_id AND public=true AND shared=false"
+        public_maps_res = db.session.execute(public_maps_query, {"user_id": friend_id}).fetchall()
+
+        return render_template("user.jinja", sharedmaps=shared_maps_res, name=user_res[0], publicmaps=public_maps_res, navigation="user")
     else:
         response = make_response(redirect("/"))
         response.set_cookie("alert", "no_friend")
         return response
     
-@app.route("/addfrequest/", methods=["POST"])
+@app.route("/addfrequest", methods=["POST"])
 def addfrequest():
     friend_name = request.form["name"]
     user_query = "SELECT id FROM users WHERE username=:friend_name"
     user_res = db.session.execute(user_query, {"friend_name": friend_name}).fetchone()
 
-    if user.res != None:
-        print("löytyi")
+    if user_res != None and user_res[0] != session["user_id"]:
+        already_query = "SELECT id FROM users WHERE id=:user_id AND :friend_id=ANY(friends)"
+        already_res = db.session.execute(already_query, {"user_id": session["user_id"], "friend_id": user_res[0]}).fetchone()
+        
+        if already_res == None:
+            frequest_already_query = "SELECT id FROM requests WHERE sender=:sender AND receiver=:receiver"
+            frequest_already_res = db.session.execute(frequest_already_query, {"sender": session["user_id"], "receiver": user_res[0]}).fetchone()
+            frequest_already_query2 = "SELECT id FROM requests WHERE sender=:sender AND receiver=:receiver"
+            frequest_already_res2 = db.session.execute(frequest_already_query, {"sender": user_res[0], "receiver": session["user_id"]}).fetchone()
 
-    return
+            if frequest_already_res == None and frequest_already_query2 == None:
+                frequest_query = "INSERT INTO requests (sender, receiver) VALUES (:sender, :receiver)"
+                frequest_res = db.session.execute(frequest_query, {"sender": session["user_id"], "receiver": user_res[0]})
+                db.session.commit()
+            else:
+                response = make_response(redirect("/"))
+                response.set_cookie("alert", "frequest_duplicate")
+                return response
+        else:
+            response = make_response(redirect("/"))
+            response.set_cookie("alert", "frequest_old")
+            return response
+
+        response = make_response(redirect("/"))
+        response.set_cookie("alert", "frequest_send")
+        return response
+    elif user_res != None and user_res[0] == session["user_id"]:
+        response = make_response(redirect("/"))
+        response.set_cookie("alert", "frequest_self")
+        return response
+
+    response = make_response(redirect("/"))
+    response.set_cookie("alert", "frequest_fail")
+    return response

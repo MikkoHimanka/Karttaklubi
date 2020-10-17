@@ -51,6 +51,15 @@
                 <button id="buttonPublic">Aseta kartta yksityiseksi</button>
             </div>
         {% endif %}
+        {% if not shared %}
+            <div class="buttons">
+                <button id="buttonShared">Jaa kartta kavereille</button>
+            </div>
+        {% else %}
+            <div class="buttons">
+                <button id="buttonShared">Piilota kartta kavereilta</button>
+            </div>
+        {% endif %}
         <script src="{{ url_for('static', filename='makepublicbutton.js') }}"></script>
     {% endif %}
     </div>

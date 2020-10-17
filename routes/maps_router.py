@@ -17,6 +17,9 @@ def savemap():
 
 @app.route("/maps/new_column/<int:mapcollection_id>")
 def new_column(mapcollection_id):
+    if not session:
+        return redirect("/")
+
     map_array_query = "SELECT * FROM mapcollections WHERE id=:mapcollection_id"
     map_array = db.session.execute(map_array_query, {"mapcollection_id":mapcollection_id}).fetchone()
     map_new_array = map_array[2].copy()
@@ -39,6 +42,9 @@ def new_column(mapcollection_id):
 
 @app.route("/maps/new_row/<int:mapcollection_id>")
 def new_row(mapcollection_id):
+    if not session:
+        return redirect("/")
+
     map_array_query = "SELECT * FROM mapcollections WHERE id=:mapcollection_id"
     map_array = db.session.execute(map_array_query, {"mapcollection_id":mapcollection_id}).fetchone()
     map_row_size = len(map_array[2][0])
@@ -63,6 +69,9 @@ def new_row(mapcollection_id):
 
 @app.route("/newmap", methods=["POST"])
 def newmap():
+    if not session:
+        return redirect("/")
+
     if request.form["name"].strip() == "":
         response = make_response(redirect("/"))
         response.set_cookie("alert", "empty_mapname")
@@ -74,7 +83,7 @@ def newmap():
     
 
     
-    new_mapcollections_query = "INSERT INTO mapcollections (owner, maps, rows, name, public) VALUES (:user, ARRAY[:map_id], 1, :name, False)"
+    new_mapcollections_query = "INSERT INTO mapcollections (owner, maps, rows, name, public, shared) VALUES (:user, ARRAY[:map_id], 1, :name, False, False)"
     mapcollection_id = db.session.execute(new_mapcollections_query, {"user": session["user_id"], "map_id": [map_id], "name": request.form["name"]})
     db.session.commit()
     
@@ -87,12 +96,13 @@ def maps(map_id):
     if not session:
         return redirect("/")
     
-    map_query = "SELECT maps, name, public, owner FROM mapcollections WHERE id=:map_id"
+    map_query = "SELECT maps, name, public, owner, shared FROM mapcollections WHERE id=:map_id"
     map_result = db.session.execute(map_query, {"map_id": map_id}).fetchone()
+    
     if not map_result:
         return redirect("/")
 
-    if map_result[2] != True and map_result[3] != session["user_id"]:
+    if not map_result[2] and not map_result[4] and map_result[3] != session["user_id"]:
         return redirect("/")
 
     mapcollection= map_result[0]
@@ -105,7 +115,7 @@ def maps(map_id):
             submap_result = db.session.execute(submap_query, {"submap_id":m}).fetchone()[1]
             maps.append(submap_result)
     
-    msg_query = "SELECT u.username, m.message, m.id FROM messages m LEFT JOIN users u ON m.author = u.id WHERE owner_id=:id AND m.submap=False ORDER BY m.time ASC"
+    msg_query = "SELECT u.username, m.message, m.id FROM messages m LEFT JOIN users u ON m.author = u.id WHERE owner_id=:id AND m.submap=False ORDER BY m.time DESC"
     msg_result = db.session.execute(msg_query, {"id":map_id}).fetchall()
 
     return render_template("maps.jinja",
@@ -116,32 +126,83 @@ def maps(map_id):
         mapcollection_id=map_id,
         owner=map_result[3],
         public=map_result[2],
+        shared=map_result[4],
         navigation="maps",
         msg_target_id=map_id)
 
 @app.route("/editor/<int:map_id>")
 def editor(map_id):
-    parent_query = "SELECT a.id FROM mapcollections a WHERE :id = ANY(a.maps)"
-    parent_res = db.session.execute(parent_query, {"id": map_id}).fetchone()
-    map_query = "SELECT * FROM maps WHERE id=:id"
-    res = db.session.execute(map_query, {"id": map_id}).fetchone()
-    data = json.dumps(res[1])
+    if not session:
+        return redirect("/")
 
-    msg_query = "SELECT u.username, m.message, m.id FROM messages m LEFT JOIN users u ON m.author = u.id WHERE owner_id=:id AND submap=True ORDER BY m.time DESC"
-    msg_result = db.session.execute(msg_query, {"id":map_id}).fetchall()
-    
-    return render_template("editor.jinja",
-        map_data=data,
-        map_id=map_id,
-        navigation="editor",
-        parent=parent_res[0],
-        messages=msg_result,
-        msg_target_id=map_id)
+    parent_query = "SELECT a.id, a.owner, a.shared, a.public FROM mapcollections a WHERE :id = ANY(a.maps)"
+    parent_res = db.session.execute(parent_query, {"id": map_id}).fetchone()
+
+    allowed = parent_res[1] == session["user_id"]
+
+    if not allowed and parent_res != None:
+        allowed = parent_res[2]
+                    
+        if not allowed and parent_res[1] != session["user_id"]:
+            if parent_res[3] == True:
+                check_friends_q = "SELECT id FROM users WHERE id=:owner_id AND :user_id=ANY(friends)"
+                check_result = db.session.execute(check_friends_q, {"owner_id": parent_res[1], "user_id": session["user_id"]}).fetchone()
+                allowed = check_result != None
+
+    if allowed:
+        map_query = "SELECT mapdata FROM maps WHERE id=:id"
+        res = db.session.execute(map_query, {"id": map_id}).fetchone()
+        data = json.dumps(res[0])
+
+        msg_query = "SELECT u.username, m.message, m.id FROM messages m LEFT JOIN users u ON m.author = u.id WHERE owner_id=:id AND submap=True ORDER BY m.time DESC"
+        msg_result = db.session.execute(msg_query, {"id":map_id}).fetchall()
+
+        return render_template("editor.jinja",
+            map_data=data,
+            map_id=map_id,
+            navigation="editor",
+            parent=parent_res[0],
+            messages=msg_result,
+            msg_target_id=map_id)
+    else:
+        response = make_response(redirect("/"))
+        response.set_cookie("alert", "no_map")
+        return response
+
+
 
 @app.route("/public/<int:map_id>", methods=["POST"])
 def public(map_id):
-    public_query = "UPDATE mapcollections SET public = NOT public WHERE id = :map_id"
-    db.session.execute(public_query, {"map_id": map_id})
-    db.session.commit()
+    if not session:
+        return jsonify(success=False)
+    
+    parent_query = "SELECT a.id, a.owner FROM mapcollections a WHERE id=:id"
+    parent_res = db.session.execute(parent_query, {"id": map_id}).fetchone()
 
-    return jsonify(success=True)
+    allowed = parent_res[1] == session["user_id"]
+
+    if allowed:
+        public_query = "UPDATE mapcollections SET public = NOT public WHERE id = :map_id"
+        db.session.execute(public_query, {"map_id": map_id})
+        db.session.commit()
+
+        return jsonify(success=True)
+    else: return jsonify(success=False)
+
+@app.route("/share/<int:map_id>", methods=["POST"])
+def share(map_id):
+    if not session:
+        return jsonify(success=False)
+
+    parent_query = "SELECT a.id, a.owner FROM mapcollections a WHERE id=:id"
+    parent_res = db.session.execute(parent_query, {"id": map_id}).fetchone()
+
+    allowed = parent_res[1] == session["user_id"]
+
+    if allowed:
+        public_query = "UPDATE mapcollections SET shared = NOT shared WHERE id = :map_id"
+        db.session.execute(public_query, {"map_id": map_id})
+        db.session.commit()
+
+        return jsonify(success=True)
+    else: return jsonify(success=False)

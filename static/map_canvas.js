@@ -180,13 +180,27 @@ function execute() {
                     color = HslToRgb(Interpolate2Colors(color1, color2, dataEntity-20, 30));
                     break;
                 case (dataEntity < 100):
-
                     color1 = RgbToHsl([125, 191, 54]);
                     color2 = RgbToHsl([55, 163, 16]);
                     color = HslToRgb(Interpolate2Colors(color1, color2, dataEntity-50, 50));
                     break;
-                case (dataEntity >= 100):
-                    color = [255,255,255];
+                case (dataEntity < 125):
+                    color1 = RgbToHsl([55, 163, 16]);
+                    color2 = RgbToHsl([115, 145, 102]);
+                    color = HslToRgb(Interpolate2Colors(color1, color2, dataEntity-100, 25));
+                    break;
+                case (dataEntity < 200):
+                    color1 = RgbToHsl([115, 145, 102]);
+                    color2 = RgbToHsl([196, 196, 196]);
+                    color = HslToRgb(Interpolate2Colors(color1, color2, dataEntity-125, 75));
+                    break;
+                case (dataEntity < 255):
+                    color1 = RgbToHsl([196, 196, 196]);
+                    color2 = RgbToHsl([225, 228, 237]);
+                    color = HslToRgb(Interpolate2Colors(color1, color2, dataEntity-200, 55));
+                    break;
+                case (dataEntity >= 255):
+                    color = [225, 228, 237];
                     break;
             }
 

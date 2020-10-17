@@ -9,11 +9,17 @@ function Interpolate(value1, value2, step, steps) {
     return (value2 - value1) * step / steps + value1;
 }
 
-function RgbToHsl(r,g,b) {
+function Interpolate2Colors(color1, color2, step, steps) {
+    return [Interpolate(color1[0],color2[0], step, steps),
+        Interpolate(color1[1], color2[1], step, steps),
+        Interpolate(color1[2], color2[2], step, steps)];
+}
+
+function RgbToHsl(arr) {
     //From wikipedia
-    r /= 255;
-    g /= 255;
-    b /= 255;
+    r = arr[0]/255;
+    g = arr[1]/255;
+    b = arr[2]/255;
 
     var max = Math.max(r,g,b);
     var min = Math.min(r,g,b);
@@ -37,11 +43,10 @@ function RgbToHsl(r,g,b) {
     return [(h*360), (s*100), (l*100)];
 }
 
-function HslToRgb(h, s, l){
-    //From wikipedia
-    h /= 360;
-    s /= 100;
-    l /= 100;
+function HslToRgb(arr){
+    h = arr[0]/360;
+    s = arr[1]/100;
+    l = arr[2]/100;
 
     var r, g, b;
 
@@ -91,39 +96,46 @@ function createImage(data, context, imageData) {
 
         switch (true) {
             case (dataEntity == 0):
-                color = [0, 182, 207];
-                break;
-            case (dataEntity < 10):
-                color1 = RgbToHsl(0, 182, 207);
-                color2 = RgbToHsl(141, 234, 246);
-                color = HslToRgb(Interpolate(color1[0],color2[0], dataEntity, 4),
-                    Interpolate(color1[1], color2[1], dataEntity-1, 9),
-                    Interpolate(color1[2], color2[2], dataEntity-1, 9));
-                break;
-            case (dataEntity < 20):
-                color1 = RgbToHsl(234, 223, 158);
-                color2 = RgbToHsl(219, 207, 136);
-                color = HslToRgb(Interpolate(color1[0],color2[0], dataEntity-4, 5),
-                    Interpolate(color1[1], color2[1], dataEntity-10, 10),
-                    Interpolate(color1[2], color2[2], dataEntity-10, 10));
-                break;
-            case (dataEntity < 50):
-                color1 = RgbToHsl(219, 207, 136);
-                color2 = RgbToHsl(125, 191, 54);
-                color = HslToRgb(Interpolate(color1[0],color2[0], dataEntity-10, 15),
-                    Interpolate(color1[1], color2[1], dataEntity-20, 30),
-                    Interpolate(color1[2], color2[2], dataEntity-20, 30));
-                break;
-            case (dataEntity < 100):
-
-                color1 = RgbToHsl(125, 191, 54);
-                color2 = RgbToHsl(55, 163, 16);
-                color = HslToRgb(Interpolate(color1[0],color2[0], dataEntity-25, 25),
-                    Interpolate(color1[1], color2[1], dataEntity-50, 50),
-                    Interpolate(color1[2], color2[2], dataEntity-50, 50));
-                break;
-            case (dataEntity >= 50):
-                color = [255,255,255];
+                    color = [0, 182, 207];
+                    break;
+                case (dataEntity < 10):
+                    color1 = RgbToHsl([0, 182, 207]);
+                    color2 = RgbToHsl([141, 234, 246]);
+                    color = HslToRgb(Interpolate2Colors(color1, color2, dataEntity-1, 9));
+                    break;
+                case (dataEntity < 20):
+                    color1 = RgbToHsl([234, 223, 158]);
+                    color2 = RgbToHsl([219, 207, 136]);
+                    color = HslToRgb(Interpolate2Colors(color1, color2, dataEntity-10, 10));
+                    break;
+                case (dataEntity < 50):
+                    color1 = RgbToHsl([219, 207, 136]);
+                    color2 = RgbToHsl([125, 191, 54]);
+                    color = HslToRgb(Interpolate2Colors(color1, color2, dataEntity-20, 30));
+                    break;
+                case (dataEntity < 100):
+                    color1 = RgbToHsl([125, 191, 54]);
+                    color2 = RgbToHsl([55, 163, 16]);
+                    color = HslToRgb(Interpolate2Colors(color1, color2, dataEntity-50, 50));
+                    break;
+                case (dataEntity < 125):
+                    color1 = RgbToHsl([55, 163, 16]);
+                    color2 = RgbToHsl([115, 145, 102]);
+                    color = HslToRgb(Interpolate2Colors(color1, color2, dataEntity-100, 25));
+                    break;
+                case (dataEntity < 200):
+                    color1 = RgbToHsl([115, 145, 102]);
+                    color2 = RgbToHsl([196, 196, 196]);
+                    color = HslToRgb(Interpolate2Colors(color1, color2, dataEntity-125, 75));
+                    break;
+                case (dataEntity < 255):
+                    color1 = RgbToHsl([196, 196, 196]);
+                    color2 = RgbToHsl([225, 228, 237]);
+                    color = HslToRgb(Interpolate2Colors(color1, color2, dataEntity-200, 55));
+                    break;
+                case (dataEntity >= 255):
+                    color = [225, 228, 237];
+                    break;
         }
 
         var normalSum = normal[0] + normal[1];

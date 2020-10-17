@@ -11,6 +11,18 @@
         <div style="display: flex; flex-direction: row;">
             {% if alert == "no_friend" %}
                 <div id="alertBox">Käyttäjää ei löytynyt</div>
+            {% elif alert == "frequest_send" %}
+                <div id="alertBox">Kaveripyyntö lähetetty</div>
+            {% elif alert == "frequest_old" %}
+                <div id="alertBox">Käyttäjä on jo kaverisi</div>
+            {% elif alert == "frequest_self" %}
+                <div id="alertBox">Et voi olla itsesi kaveri</div>
+            {% elif alert == "frequest_fail" %}
+                <div id="alertBox">Käyttäjää ei löytynyt</div>
+            {% elif alert == "frequest_duplicate" %}
+                <div id="alertBox">Kaveripyyntö jo olemassa</div>
+            {% elif alert == "no_map" %}
+                <div id="alertBox">Karttaa ei löytynyt</div>
             {% endif %}
             {% include "alku.jinja" %}
             {% include "requests.jinja" %}

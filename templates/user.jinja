@@ -3,5 +3,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <head><title>Karttaklubi</title></head>
 <body>
-    USERS.JINJA
+    <div class="siteWrap">
+        <div class="header">
+            {% include "header.jinja" %}
+        </div>
+        <div style="display: flex; flex-direction: column;">
+            <div class="center" style="font-weight: bold; margin-bottom: 1em; font-size: x-large;">
+            {{name}}
+            </div>
+            <div class="center" style="font-weight: bold; text-decoration: underline; margin-bottom: 1em;">Jaetut kartat</div>
+            {% for map in sharedmaps %}
+                <div class="center">
+                <p><a href=/maps/{{map[0]}}>{{map[1]}}</a></p>
+                </div>
+             {% endfor %}
+
+            <div class="center" style="font-weight: bold; text-decoration: underline; margin-bottom: 1em;">Julkiset kartat</div>
+            {% for map in publicmaps %}
+                <div class="center">
+                <p><a href=/maps/{{map[0]}}>{{map[1]}}</a></p>
+                </div>
+             {% endfor %}
+        </div>
+    </div>
 </body>
