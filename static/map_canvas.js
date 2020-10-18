@@ -433,9 +433,7 @@ function execute() {
                     value += Math.floor(value * (Math.random()-0.5)*(noise/50));
                     value = value < 1 ? 0 : value;
                     data[editIndex] = Math.floor(data[editIndex] + value * intensity);
-                    if (flipped) {
-                        data[editIndex] = data[editIndex] < 0 ? 0 : data[editIndex];
-                    }
+                    data[editIndex] = data[editIndex] < 0 ? 0 : data[editIndex];
 
                 }
             }
