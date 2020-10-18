@@ -304,6 +304,10 @@ function execute() {
         movedEnough = (Math.abs(Math.floor((e.clientX - container.left)) - Math.floor((prevMouse[0] - container.left))) > ratio/flow) ||
             (Math.abs(Math.floor((e.clientY - container.top)) - Math.floor((prevMouse[1] - container.top))) > ratio/flow);
 
+        if (flipped) {
+            intensity *= -1;
+        }
+
         if (hold && movedEnough) {
             prevMouse = [e.clientX, e.clientY]
             if (!shift) {
