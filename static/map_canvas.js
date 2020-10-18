@@ -235,7 +235,7 @@ function execute() {
     createImage(data, prng);
     
     document.onkeydown = function (e) {
-        if (e.key == "Alt") {
+        if (e.key == "Control") {
             flipped = true;
         }
         if (e.key == "Shift" && !flipped) {
@@ -247,7 +247,7 @@ function execute() {
     }
 
     document.onkeyup = function (e) {
-        if (e.key == "Alt") {
+        if (e.key == "Control") {
             flipped = false;
         }
         if (e.key == "Shift") {
@@ -432,9 +432,13 @@ function execute() {
                     value = (size)/2 - Math.floor(size - Math.sqrt(Math.abs((x-size/2)**2 + (y-size/2)**2 - (size-size/4)**2)));
                     value += Math.floor(value * (Math.random()-0.5)*(noise/50));
                     value = value < 1 ? 0 : value;
-                    data[editIndex] = Math.floor(data[editIndex] + value * intensity);
-                    data[editIndex] = data[editIndex] < 0 ? 0 : data[editIndex];
-
+                    res = Math.floor(data[editIndex] + value * intensity);
+                    if (res > data[editIndex] && !flipped) {
+                        data[editIndex] = res;
+                    }
+                    if (res < data[editIndex] && flipped && res >= 0) {
+                        data[editIndex] = res;
+                    }
                 }
             }
         }
