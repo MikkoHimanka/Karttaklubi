@@ -6,11 +6,18 @@ import threading
 import time
 
 db = SQLAlchemy(app)
+threads = {}
 
 class timeThread(threading.Thread):
-    def __init__(self):
+    def __init__(self, address, id):
         super(timeThread, self).__init__()
         self._stopper = threading.Event()
+        self.elapsed = 0
+        self.addr = address
+        self.id = id
+
+    def addTime(self):
+        self.elapsed = 0
 
     def stopit(self):
         self._stopper.set()
@@ -19,15 +26,71 @@ class timeThread(threading.Thread):
         return self._stopper.isSet()
     
     def run(self):
+        while self.elapsed < 10:
+            if self.stopped():
+                return
+            time.sleep(1)
+            self.elapsed += 1
+        
+        set_editable_query = "UPDATE maps SET editable=true WHERE id=:id"
+        db.session.execute(set_editable_query, {"id": self.id})
+        db.session.commit()
+        self._stopper.set()
+
+class monitorThread(threading.Thread):
+    def __init__(self):
+        super(monitorThread, self).__init__()
+        self._stopper = threading.Event()
+        self.name = "monitor"
+    
+    def stopThread(self, name):
+        if threads[name].stopped:
+            threads[name].join()
+            threads.pop(name)
+            print("times up")
+
+    def stopit(self):
+        self._stopper.set()
+
+    def stopped(self):
+        return self._stopper.isSet()
+
+    def run(self):
+        elapsed = 1
         while True:
             if self.stopped():
                 return
-            print("AAAAA")
-            time.sleep(1)
+            
+            if elapsed % 11 == 0:
+                threadsToPop = []
+                for t in threads:
+                    if threads[t].stopped:
+                        threadsToPop.append(t)
+                for t in threadsToPop:
+                    self.stopThread(t)
+                threadsToPop.clear()
+                
+                elapsed = 1
+            else:
+                time.sleep(1)
+                elapsed += 1     
+
+monitori = monitorThread()
+monitori.start()
+
+@app.route("/add_time", methods=["POST"])
+def add_time():
+    if request.remote_addr in threads:
+        threads[request.remote_addr].addTime()
+
+        return jsonify(success=True)
+    else: return jsonify(success=False)
 
 @app.route("/save_map", methods=["POST"])
 def savemap():
     data = json.loads(request.form["data"])
+
+
 
     save_query = "UPDATE maps SET mapdata=:map_data WHERE id=:map_id"
     db.session.execute(save_query, {"map_data": data, "map_id":request.form["id"]})
@@ -110,8 +173,6 @@ def newmap():
     
     return redirect("/")
 
-
-
 @app.route("/maps/<int:map_id>")
 def maps(map_id):
     if not session:
@@ -129,12 +190,14 @@ def maps(map_id):
     mapcollection= map_result[0]
     map_title = map_result[1]
     maps = []
+    editables = []
     
     for row in mapcollection:
         for m in row:
-            submap_query = "SELECT id, mapdata FROM maps WHERE id=:submap_id"
-            submap_result = db.session.execute(submap_query, {"submap_id":m}).fetchone()[1]
-            maps.append(submap_result)
+            submap_query = "SELECT id, mapdata, editable FROM maps WHERE id=:submap_id"
+            submap_result = db.session.execute(submap_query, {"submap_id":m}).fetchone()
+            maps.append(submap_result[1])
+            editables.append(1) if submap_result[2] else editables.append(0)
     
     msg_query = "SELECT u.username, m.message, m.id FROM messages m LEFT JOIN users u ON m.author = u.id WHERE owner_id=:id AND m.submap=False ORDER BY m.time DESC"
     msg_result = db.session.execute(msg_query, {"id":map_id}).fetchall()
@@ -142,6 +205,7 @@ def maps(map_id):
     return render_template("maps.jinja",
         mapcollection=mapcollection,
         submaps=maps,
+        editables=editables,
         messages=msg_result,
         title=map_title,
         mapcollection_id=map_id,
@@ -158,6 +222,12 @@ def editor(map_id):
 
     parent_query = "SELECT a.id, a.owner, a.shared, a.public FROM mapcollections a WHERE :id = ANY(a.maps)"
     parent_res = db.session.execute(parent_query, {"id": map_id}).fetchone()
+
+    editable_query = "SELECT editable FROM maps WHERE id=:id"
+    editable_res = db.session.execute(editable_query, {"id": map_id}).fetchone()
+    print(editable_res)
+    if not editable_res[0]:
+        return redirect("/")
 
     allowed = parent_res[1] == session["user_id"]
 
@@ -178,11 +248,13 @@ def editor(map_id):
         msg_query = "SELECT u.username, m.message, m.id FROM messages m LEFT JOIN users u ON m.author = u.id WHERE owner_id=:id AND submap=True ORDER BY m.time DESC"
         msg_result = db.session.execute(msg_query, {"id":map_id}).fetchall()
 
-        event = threading.Event()
-        threadi = timeThread()
-        threadi.start()
-        threadi.join()
-        
+        threads[request.remote_addr] = timeThread(request.remote_addr, map_id)
+        threads[request.remote_addr].start()
+
+        set_editable_query = "UPDATE maps SET editable=False WHERE id=:id"
+        db.session.execute(set_editable_query, {"id": map_id})
+        db.session.commit()
+
         return render_template("editor.jinja",
             map_data=data,
             map_id=map_id,

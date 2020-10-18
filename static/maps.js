@@ -1,3 +1,5 @@
+const lock = document.getElementById("lock");
+
 function applyColor(imageData, i, [r,g,b]) {
     imageData.data[4*i] = r;        //R
     imageData.data[4*i + 1] = g;    //G
@@ -72,7 +74,7 @@ function HslToRgb(arr){
     return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
 }
 
-function createImage(data, context, imageData) {
+function createImage(data, context, imageData, locked) {
     rowLength = Math.sqrt(data.length);
 
     for (let i = 0; i < data.length; i++) {
@@ -149,10 +151,14 @@ function createImage(data, context, imageData) {
         applyColor(imageData, i, color);
     }
     context.putImageData(imageData, 0, 0);
+    if (locked) {
+        context.drawImage(lock, 0, 0, 256, 256);
+    }
 }
 
 var indeksi = 0;
 var data = $('#mapdata').data();
+var editables = data.editables;
 var mapcollection = data.mapcollection;
 
 var submaps = data.submaps;
@@ -163,29 +169,36 @@ var cellWidth = mapcollection.length > mapcollection[0].length ?
     (parent.offsetHeight/mapcollection.length) :
     (parent.offsetHeight/mapcollection[0].length);
 
-for (let i = 0; i < mapcollection.length; i++) {
-    var row = document.createElement("div");
-    row.style.width = "inherit"
-    row.style.display = "flex"
-    row.style.flexDirection = "row"
-    row.style.marginTop = -10 + "px";
-
-    parent.appendChild(row);
-    for (let j = 0; j < mapcollection[i].length; j++) {
-        var node = document.createElement("a");
-        node.setAttribute("href", `/editor/${mapcollection[i][j]}`);
-        var jdata = submaps[indeksi]
-        var canvas = document.createElement("canvas");
-        canvas.setAttribute("width", 256)
-        canvas.setAttribute("height", 256)
-        node.appendChild(canvas);
-        canvas.style.width = cellWidth + "px"
-        canvas.style.height = cellWidth + "px"
-        canvas.style.border = "1px solid #000"
-        row.appendChild(node);
-        var context = canvas.getContext('2d');
-        var imageData = context.createImageData(Math.sqrt(jdata.length), Math.sqrt(jdata.length));
-        createImage(jdata, context, imageData);
-        indeksi++;
-    }
-};
+window.addEventListener('load', (e) => {
+    for (let i = 0; i < mapcollection.length; i++) {
+        var row = document.createElement("div");
+        row.style.width = "inherit"
+        row.style.display = "flex"
+        row.style.flexDirection = "row"
+        row.style.marginTop = -10 + "px";
+    
+        parent.appendChild(row);
+        for (let j = 0; j < mapcollection[i].length; j++) {
+            var node = document.createElement("a");
+            node.setAttribute("href", `/editor/${mapcollection[i][j]}`);
+            var locked = editables[indeksi] == 1 ? false : true;
+            var jdata = submaps[indeksi]
+            var canvas = document.createElement("canvas");
+            canvas.setAttribute("width", 256)
+            canvas.setAttribute("height", 256)
+            canvas.style.width = cellWidth + "px"
+            canvas.style.height = cellWidth + "px"
+            canvas.style.border = "1px solid #000"
+            if (locked) {
+                row.appendChild(canvas)
+            } else {
+                node.appendChild(canvas);
+                row.appendChild(node);
+            }
+            var context = canvas.getContext('2d');
+            var imageData = context.createImageData(Math.sqrt(jdata.length), Math.sqrt(jdata.length));
+            createImage(jdata, context, imageData, locked);
+            indeksi++;
+        }
+    };
+});
